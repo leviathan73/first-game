@@ -1,9 +1,15 @@
-body{
+body {
     margin: 0;
     padding: 0;
     overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background: black;
 }
-canvas{
+canvas {
     border: 3px solid black;
     background: rgb(21, 21, 37);
+   
 }

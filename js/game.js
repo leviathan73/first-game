@@ -16,9 +16,6 @@ class Gra {
   //bodies
   bodies = [];
 
-  bullets = [];
-  ship = new Statek();
-
   constructor(zycia) {
     this.punktacja = 20;
     if (zycia) this.zycia = zycia;
@@ -33,52 +30,38 @@ class Gra {
     this.zycieImage = new Image(25, 25);
     this.zycieImage.src = "gfx/heart.svg";
 
-    this.bodies.push(new Body2d(2));
-    this.bodies.push(new Body2d(1));
-    this.bodies.push(new Body2d(7));
+    this.body1 = new Body2d();
+    this.body1.setPosition(200, 200);
+    this.body1.setRadius(50);
 
-    for (let body of this.bodies) {
-      body.addForce(new Vector(1, 1));
-    }
+    this.body2 = new Body2d();
+    this.body2.setPosition(200, 200);
+    this.body2.setRadius(50);
+
+    this.bodies.push(this.body1);
+    this.bodies.push(this.body2);
 
     window.addEventListener("mousemove", (e) => {
-      this.ship.setDirectionTo(e.clientX, e.clientY);
+      let vx = e.clientX - this.body2.p.x;
+      let vy = e.clientY - this.body2.p.y;
+      let v = new Vector(vx, vy)
+      v = v.normalize().multiply(2)
+      this.body2.setVelocity(v.x, v.y);
+      this.body2.setDirection(v.x, v.y);
     });
 
-    
-      window.addEventListener("mousedown", (e) => {
-            const f = this.ship.body2d.p
-              .vectorTo(
-                new Point(this.ship.directionToX, this.ship.directionToY)
-              )
-              .normalize()
-              .multiply(4);
-          
-          const bullet = new Body2d(0.1)
-          bullet.radius = 2;
-          bullet.setPosition(this.ship.body2d.p.x, this.ship.body2d.p.y);
-        bullet.setVelocity(f.x, f.y);
-        this.bullets.push(bullet)        
-    });
+    window.addEventListener("mousedown", (e) => {});
 
-    window.addEventListener("keydown", (e) => {
-      const f = this.ship.body2d.p
-        .vectorTo(new Point(this.ship.directionToX, this.ship.directionToY))
-        .normalize()
-        .multiply(10);
-      this.ship.body2d.applyForce(f);
-    });
+    window.addEventListener("keydown", (e) => {});
 
-    window.addEventListener("keyup", (e) => {
-      this.ship.body2d.applyForce(new Vector(0, 0));
-    });
+    window.addEventListener("keyup", (e) => {});
   }
 
   uruchom() {
     this.wyczyscCanvas();
+
     this.animateBodies();
-      this.animateShip();
-      this.animateBullets();
+
     this.wyswietlPunkty();
     this.wyswietlZycia();
   }
@@ -88,18 +71,6 @@ class Gra {
       body.update();
       body.draw(this.context);
     }
-  }
-
-  animateBullets() {
-    for (let b of this.bullets) {
-      b.update();
-      b.draw(this.context);
-    }
-  }
-
-  animateShip() {
-    this.ship.update();
-    this.ship.draw(this.context);
   }
 
   wyswietlPunkty() {
@@ -126,8 +97,8 @@ class Gra {
 const gra = new Gra();
 
 function petlaGry() {
-        gra.uruchom()
-        requestAnimationFrame(petlaGry);
+  gra.uruchom();
+  requestAnimationFrame(petlaGry);
 }
 
-petlaGry()
+petlaGry();

@@ -48,8 +48,11 @@ class Vector {
     return new Vector(normX, normY);
   }
 
-  multiply(a) {
-    return new Vector(this.x * a, this.y * a);
+  multiply(by) {
+    return new Vector(this.x * by, this.y * by);
+  }
+  divide(by) {
+    return new Vector(this.x / by, this.y / by);
   }
 
   add(v) {

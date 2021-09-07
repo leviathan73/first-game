@@ -1,6 +1,6 @@
 import { Ship, Meteor, Bullet } from "./actors.js";
 import { Vector } from "./2dmath.js";
-import * as THREE from "https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.module.js";
+import * as THREE from "three";
 
 const maksZyc = 3;
 /**

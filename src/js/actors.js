@@ -1,6 +1,6 @@
 import { Vector } from "./2dmath.js";
 import { Body2d } from "./body2d.js";
-import * as THREE from "https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.module.js";
+import * as THREE from "three";
 
 const fireAudio = new Audio("./assets/gun2.mp3");
 fireAudio.volume = 0.1;

@@ -1,0 +1,26 @@
+{
+  "name": "asteroids",
+  "version": "1.0.0",
+  "description": "<<<<<<< HEAD\r # first-game\r Repository created to tuck all necessary files needed to create my first ever web game!\r =======\r # asteroids\r >>>>>>> master",
+  "main": "index.js",
+  "scripts": {
+    "dev": "parcel \"src/index.html\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/git-dusza/first-game.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/git-dusza/first-game/issues"
+  },
+  "homepage": "https://github.com/git-dusza/first-game#readme",
+  "dependencies": {
+    "three": "0.132.2"
+  },
+  "devDependencies": {
+    "@types/three": "0.131.0"
+  }
+}

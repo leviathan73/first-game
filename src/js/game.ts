@@ -109,21 +109,16 @@ class Gra {
 		this._punktacja = 20;
 		this.setupCanvas();
 		this.setupStars();
-		this.setupAssets();
 		this.setupPlayer();
 		this.setupMeteors(2);
 		this.setupListeners();
 	}
 
 	font!: FontFace;
-	setupAssets() {
+	async setupAssets() {
 		// @ts-ignore
 		this.font = new FontFace("DotsFont", `url(${fontAsset})`);
-		this.font.load().then(function (font) {
-			// with canvas, if this is ommited won't work
-			// @ts-ignore
-			document.fonts.add(font);
-		});
+		return this.font.load()
 	}
 
 	setupCanvas() {
@@ -337,9 +332,12 @@ class Gra {
 
 	drawScore() {
 		this.context.strokeStyle = "#DDDDDD";
-		this.context.fillStyle = "#DDDDDD";
+		this.context.lineWidth = 1;
+
+		this.context.fillStyle = "black";
 		this.context.font = "64px DotsFont";
-		this.context.fillText(`${this._punktacja}`, 10, 60);
+		this.context.fillText(`${this._punktacja}`, 10, 60, 200);
+		this.context.strokeText(`${this._punktacja}`, 10, 60, 200);
 	}
 
 	drawLives() {
@@ -420,6 +418,12 @@ class Gra {
 }
 
 const gra = new Gra(); // 1
+gra.setupAssets().then(function (font) {
+	// with canvas, if this is ommited won't work
+	// @ts-ignore
+	document.fonts.add(font);
+	petlaGry(); // 2
+});
 
 function petlaGry() {
 	gra.render2D(); // 3, 4 ,5 ,6 ,7 ,8
@@ -428,4 +432,4 @@ function petlaGry() {
 	requestAnimationFrame(petlaGry);
 }
 
-petlaGry(); // 2
+

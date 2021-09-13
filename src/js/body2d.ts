@@ -1,4 +1,5 @@
-import { Vector, Position, Box, Point } from "./2dmath.js";
+import { Vector, Position, Box, Point } from "./2dmath";
+import { Meteor } from "./actors";
 
 export class Body2d {
   p = new Position(0, 0);
@@ -19,29 +20,29 @@ export class Body2d {
    * Nadaje siłę obracającą
    * @param {number} force najlepiej zaczynać od wartości od 0 do 1
    */
-  setTorgueForce(force) {
+  setTorgueForce(force: number) {
     this.af = force;
   }
   /**
    * ustawia przyśpieszenie obrotowe
    * @param {number} aa najlepiej zaczynać od wartości od 0 do 1
    */
-  setAngularAcceleration(aa) {
+  setAngularAcceleration(aa: number) {
     this.aa = aa;
   }
   /**
    * ustawia prędkość obrotową
    * @param {number} omega najlepiej zaczynać od wartości od 0 do 1
    */
-  setAngularVelocity(omega) {
+  setAngularVelocity(omega: number) {
     this.omega = omega;
   }
 
-  addForce(force) {
+  addForce(force: Vector) {
     this.f = this.f.add(force);
   }
 
-  setForce(x, y) {
+  setForce(x: number, y: number) {
     this.f.x = x;
     this.f.y = y;
   }
@@ -49,44 +50,44 @@ export class Body2d {
   /**
    * @param {number} r
    */
-  setRadius(r) {
+  setRadius(r: number) {
     this.radius = r;
     this.d = this.d.normalize().multiply(this.radius);
   }
 
-  setPosition(x, y) {
+  setPosition(x: number, y: number) {
     this.p.x = x;
     this.p.y = y;
   }
 
-  setPosition2(p) {
+  setPosition2(p: Position) {
     this.p = p;
   }
 
-  setDirection(x, y) {
+  setDirection(x: number, y: number) {
     this.d.x = x;
     this.d.y = y;
     this.d = this.d.normalize().multiply(this.radius);
   }
-  setDirection2(d) {
+  setDirection2(d: Vector) {
     this.d = d.normalize().multiply(this.radius);
   }
 
-  setAcceleration(x, y) {
+  setAcceleration(x: number, y: number) {
     this.a.x = x;
     this.a.y = y;
   }
 
-  setVelocity(x, y) {
+  setVelocity(x: number, y: number) {
     this.v.x = x;
     this.v.y = y;
   }
 
-  setVelocity2(v) {
+  setVelocity2(v: Vector) {
     this.v = v;
   }
 
-  setMass(m) {
+  setMass(m: number) {
     this.m = m;
   }
 
@@ -106,7 +107,7 @@ export class Body2d {
     this.d.rotate2(this.omega);
   }
 
-  draw(context) {
+  draw(context: CanvasRenderingContext2D) {
     context.save();
     context.beginPath();
     context.arc(
@@ -146,7 +147,7 @@ export class Body2d {
    * @param {Body2d} intruder
    * @returns {boolean}
    */
-  checkCollision(/** @type {Body2d} */ intruder) {
+  checkCollision(/** @type {Body2d} */ intruder: Meteor) {
     const v = this.p.vectorTo(intruder.p);
     return v.magnitude() <= this.radius + intruder.radius;
   }

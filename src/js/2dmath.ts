@@ -1,15 +1,15 @@
 export class Point {
   x = 0;
   y = 0;
-  constructor(x, y) {
+  constructor(x: number, y: number) {
     this.x = x;
     this.y = y;
   }
 
-  vectorTo(p) {
+  vectorTo(p: { x: number; y: number; }) {
     return new Vector(p.x - this.x, p.y - this.y);
   }
-  add(v) {
+  add(v: { x: number; y: number; }) {
     return new Point(this.x + v.x, this.y + v.y);
   }
 }
@@ -17,19 +17,19 @@ export class Point {
 export class Position {
   x = 0;
   y = 0;
-  constructor(x, y) {
+  constructor(x: number, y: number) {
     this.x = x;
     this.y = y;
   }
 
-  inBox(x1, y1, x2, y2) {
+  inBox(x1: number, y1: number, x2: number, y2: number) {
     return this.x >= x1 && this.x <= x2 && this.y <= y2 && this.y >= y1;
   }
 
-  vectorTo(p) {
+  vectorTo(p: { x: number; y: number; }) {
     return new Vector(p.x - this.x, p.y - this.y);
   }
-  add(v) {
+  add(v: Vector) {
     return new Position(this.x + v.x, this.y + v.y);
   }
 }
@@ -37,7 +37,7 @@ export class Position {
 export class Vector {
   x = 0;
   y = 0;
-  constructor(x, y) {
+  constructor(x: number, y: number) {
     this.x = x;
     this.y = y;
   }
@@ -60,14 +60,14 @@ export class Vector {
     let normX = this.x / this.magnitude();
     let normY = this.y / this.magnitude();
     this.x = normX;
-    this.Y = normY;
+    this.y = normY;
   }
 
-  setMagnitude(m) {
+  setMagnitude(m: number) {
     return this.normalize().multiply(m);
   }
 
-  setMagnitude2(m) {
+  setMagnitude2(m: number) {
     const newV = this.normalize().multiply(m);
     this.x = newV.x;
     this.y = newV.y;
@@ -77,13 +77,13 @@ export class Vector {
     return Math.atan2(this.x, -this.y);
   }
 
-  rotate(beta) {
+  rotate(beta: number) {
     let newX = Math.cos(beta) * this.x - Math.sin(beta) * this.y;
     let newY = Math.sin(beta) * this.x + Math.cos(beta) * this.y;
     return new Vector(newX, newY);
   }
 
-  rotate2(beta) {
+  rotate2(beta: number) {
     let newX = Math.cos(beta) * this.x - Math.sin(beta) * this.y;
     let newY = Math.sin(beta) * this.x + Math.cos(beta) * this.y;
 
@@ -91,14 +91,14 @@ export class Vector {
     this.y = newY;
   }
 
-  multiply(by) {
+  multiply(by: number) {
     return new Vector(this.x * by, this.y * by);
   }
-  divide(by) {
+  divide(by: number) {
     return new Vector(this.x / by, this.y / by);
   }
 
-  add(v) {
+  add(v: Vector) {
     return new Vector(this.x + v.x, this.y + v.y);
   }
 }
@@ -107,7 +107,7 @@ export class Box {
   x = 0;
   y = 0;
 
-  constructor(x, y) {
+  constructor(x: number, y: number) {
     this.x = x;
     this.y = y;
   }

@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "parcel \"src/index.html\"",
 	"serve": "webpack serve --mode=development",
-	"build": "webpack serve --mode=development"
+	"build": "webpack --mode=production"
   },
   "repository": {
     "type": "git",

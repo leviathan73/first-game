@@ -132,6 +132,15 @@ class Gra {
 		this.context = this._canvas2D.getContext("2d");
 		this._canvas2D.width = this._width;
 		this._canvas2D.height = this._height;
+
+		window.addEventListener("resize", ()=>{
+
+			this._width = window.innerWidth;
+			this._height = window.innerHeight;
+			this._canvas2D.width = this._width;
+			this._canvas2D.height = this._height;
+		})
+
 		this._scene = new THREE.Scene();
 		this._camera = new THREE.PerspectiveCamera(
 			90,
@@ -352,8 +361,8 @@ class Gra {
 			  this.zycia--;
 			//   newMeteors.push(...meteor.explode(this._ship.d));
 			  
-			  //this.freezeAllActors();
-			  //return false;
+			  this.freezeAllActors();
+			  return false;
 			}
 
 			for (const bullet of this._bullets) {

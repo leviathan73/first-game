@@ -14,9 +14,10 @@ interface KEYS {
 class Gra {
 	//   status gry
 
-	_punktacja: number = 0;
+	private _punktacja: number = 0;
 
-	_zycia: number = maksZyc;
+	private _zycia: number = maksZyc;
+	private _freeze: boolean = false;
 	
 	get zycia(): number {
 		return this._zycia;
@@ -26,34 +27,34 @@ class Gra {
 		this._zycia = value < 0 ? 0 : value;
 	}
 
-	_width: number = window.innerWidth;
-	_height: number = window.innerHeight;
+	private _width: number = window.innerWidth;
+	private _height: number = window.innerHeight;
 
 	//2D
-	_canvas2D!: HTMLCanvasElement;
+	private _canvas2D!: HTMLCanvasElement;
 
 	//3D
-	_canvas3D!: HTMLCanvasElement;
-	_scene!: THREE.Scene;
-	_camera!: THREE.Camera;
-	_renderer!: THREE.Renderer;
+	private _canvas3D!: HTMLCanvasElement;
+	private _scene!: THREE.Scene;
+	private _camera!: THREE.Camera;
+	private _renderer!: THREE.Renderer;
 
 	context!: CanvasRenderingContext2D;
 
-	_ship!: Ship;
-	_bullets: Bullet[] = [];
-	_meteors: Meteor[] = [];
+	private _ship!: Ship;
+	private _bullets: Bullet[] = [];
+	private _meteors: Meteor[] = [];
 
-	_mouseX = 0;
-	_mouseY = 0;
+	private _mouseX = 0;
+	private _mouseY = 0;
 
-	_keys: any = {};
+	private _keys: any = {};
 
-	_speed: number = 0;
+	private _speed: number = 0;
 
-	_isLeftMouseDown:boolean = false;
+	private _isLeftMouseDown:boolean = false;
 
-	_starsImageData!: ImageData;
+	private _starsImageData!: ImageData;
 
 	constructor() {
 		this.setupAll();
@@ -73,6 +74,7 @@ class Gra {
 		this.animatePlayer(); 
 		this.drawScore(); 
 		this.drawLives(); 
+		this.drawHelp()
 	}
 
 	drawStars() {
@@ -226,6 +228,7 @@ class Gra {
 
 		const fireSpeed = 1000 / 6; // 5 na sekunde
 		window.addEventListener("mousedown", (e) => {
+			if (this._freeze) return;
 			this.addPlayerBullet();
 			this._ship.shoot();
 			if (e.button == 0) {
@@ -237,6 +240,7 @@ class Gra {
 		});
 
 		window.addEventListener("mousedown", (e) => {
+			if (this._freeze) return;
 			let freeze = false;
 			if (e.button == 1) {
 				this.freezeAllActors();
@@ -245,6 +249,7 @@ class Gra {
 		});
 
 		window.addEventListener("mouseup", (e) => {
+			if (this._freeze) return;
 			if (e.button == 0) {
 				this._isLeftMouseDown = false;
 				clearInterval(this._bulletGeneratorInterval);
@@ -252,16 +257,19 @@ class Gra {
 		});
 
 		window.addEventListener("keydown", (e) => {
+			if (this._freeze) return;
 			if (e.code == "Space" && !this._keys["Space"]) this.addPlayerBullet();
 			this._keys[e.code] = true;
 		});
 
 		window.addEventListener("keyup", (e) => {
+			if (this._freeze) return;
 			this._keys[e.code] = false;
 		});
 	}
 
 	freezeAllActors() {
+		this._freeze = true;
 		this._ship.freeze = true;
 		this._meteors.forEach(function (meteor:Meteor) {
 			meteor.freeze = true;
@@ -344,6 +352,14 @@ class Gra {
 		}
 	}
 
+	drawHelp() {
+			this.context.save();
+			this.context
+			this.context.font = "17px DotsFont";
+			this.context.strokeText("Use ARROWS and SPACEBAR.",10,this._height-20)			
+			this.context.restore();
+	}
+
 	clearCanvas() {
 		this.context.strokeStyle = "white";
 		this.context.fillStyle = "#DDDDDD";
@@ -360,7 +376,6 @@ class Gra {
 			if (this._ship.checkCollision(meteor)) {
 			  this.zycia--;
 			//   newMeteors.push(...meteor.explode(this._ship.d));
-			  
 			  this.freezeAllActors();
 			  return false;
 			}

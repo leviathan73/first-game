@@ -195,7 +195,7 @@ class Gra {
 			this.context.globalAlpha = Math.random() * 0.6;
 			this.context.shadowBlur = 3 + size * 3;
 			this.context.stroke();
-			this.context.fill();
+			this.context.fill(); 
 		}
 
 		this.context.restore();

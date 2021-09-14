@@ -1,0 +1,1 @@
+const express=require("express"),app=express(),port=process.env.PORT;app.use("/",express.static("public")),app.get("/hello",((e,p)=>{p.send("Hello World!")})),app.listen(port,(()=>{console.log(`Example app listening at http://localhost:${port}`)}));

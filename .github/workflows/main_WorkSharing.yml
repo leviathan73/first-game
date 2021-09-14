@@ -25,7 +25,6 @@ jobs:
       run: |
         npm install
         npm run build --if-present
-        npm run test --if-present
 
     - name: Upload artifact for deployment job
       uses: actions/upload-artifact@v2
@@ -52,5 +51,6 @@ jobs:
       with:
         app-name: 'WorkSharing'
         slot-name: 'production'
+        CI: false
         publish-profile: ${{ secrets.AzureAppService_PublishProfile_1df4d17c6c784f81bbafa6acc4758d55 }}
         package: .

@@ -12,6 +12,10 @@ export declare class Body2d {
     m: number;
     radius: number;
     freeze: boolean;
+    private _lastupdate;
+    _speedfactor: number;
+    private _fps;
+    getFPSString(): string;
     constructor();
     /**
      * Nadaje siłę obracającą

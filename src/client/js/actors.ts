@@ -107,10 +107,13 @@ export class Ship extends Body2d {
 	draw(context: CanvasRenderingContext2D) {
 		context.save();
 		context.translate(this.p.x, this.p.y);
+		context.font = "13px Calibri";
+		context.fillText(`${super.getFPSString()}`, 10,-20)
 		context.rotate(this.d.angle());
 		context.translate(0, -25);
 		this.drawShipBody(context, false);
 		this.drawEngine(context);
+	
 		context.restore();
 		//super.draw(context);
 	}

@@ -14,7 +14,19 @@ export class Body2d {
   radius = 10;
   freeze = false;
 
-  constructor() {}
+  private _lastupdate: number;
+	_speedfactor: number;
+	private _fps: number;
+	
+	getFPSString() {
+		return `fps: ${Math.floor(this._fps)}`
+	} 
+  
+  constructor() {
+	  this._lastupdate = performance.now();
+	  this._speedfactor = 0.05;
+	  this._fps = 0;
+  }
 
   /**
    * Nadaje siłę obracającą
@@ -93,11 +105,13 @@ export class Body2d {
 
   update() {
     if (this.freeze) return;
+	const dt = performance.now() - this._lastupdate;
+	this._fps =  Math.abs(this._fps - (1000/dt)) > 3?(1000/dt):this._fps;
     // ruch liniowy
     var a = this.a.add(this.f.divide(this.m));
-    this.v = this.v.add(a);
-    this.p = this.p.add(this.v);
-
+    this.v = this.v.add(a.multiply(dt*this._speedfactor));
+    this.p = this.p.add(this.v.multiply(dt*this._speedfactor));
+    
     //ruch obrotowy
     var torque = this.af * this.radius;
     var inertia = 0.5 * this.m * this.radius * this.radius; //tylko dla pelnego walca. inne ksztalty powinny miec inny wzór
@@ -105,6 +119,7 @@ export class Body2d {
     var aa = this.aa + torque / inertia;
     this.omega += aa;
     this.d.rotate2(this.omega);
+	this._lastupdate = performance.now();
   }
 
   draw(context: CanvasRenderingContext2D) {

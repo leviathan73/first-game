@@ -2,6 +2,7 @@ const path = require('path');
 var HTMLWebpackPlugin = require("html-webpack-plugin");
 const NodePolyfillPlugin = require("node-polyfill-webpack-plugin")
 const CopyPlugin = require("copy-webpack-plugin");
+const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 
 module.exports = [{
 	mode: 'production',
@@ -21,6 +22,7 @@ module.exports = [{
 		],
 	},
 	plugins: [
+		new CleanWebpackPlugin(),
 		new HTMLWebpackPlugin({
 			title: "Asteroids",
 			template: "./src/client/index.html"
@@ -50,7 +52,7 @@ module.exports = [{
 		}
 	},
 	output: {
-		filename: '[name].js',
+		filename: '[name].[fullhash].js',
 		path: path.resolve(__dirname, 'public'),
 	},
 

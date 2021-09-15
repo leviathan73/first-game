@@ -50,7 +50,7 @@ jobs:
         name: node-app
     
     - name : Extract files
-      run: tar -xf files.tar && rm files.tar
+      run: tar -xf files.tar --exclude './src' --exclude './*.json' --exclude './.*' --exclude './webpack*.*' && rm files.tar
 
     - name: 'Deploy to Azure Web App'
       id: deploy-to-webapp

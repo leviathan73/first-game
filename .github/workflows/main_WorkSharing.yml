@@ -28,7 +28,7 @@ jobs:
         npm prune --production
      
     - name: 'Tar files'
-      run: tar -cvf files.tar .
+      run: tar --exclude='./src'  --exclude='./.*' --exclude='./webpack*.*' -cvf files.tar .
 
     - name: Upload artifact for deployment job
       uses: actions/upload-artifact@v2
@@ -50,7 +50,7 @@ jobs:
         name: node-app
     
     - name : Extract files
-      run: tar -xf files.tar --exclude './src' --exclude './*.json' --exclude './.*' --exclude './webpack*.*' && rm files.tar
+      run: tar -xf files.tar && rm files.tar
 
     - name: 'Deploy to Azure Web App'
       id: deploy-to-webapp

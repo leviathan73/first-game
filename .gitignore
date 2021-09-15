@@ -122,3 +122,4 @@ workspace.code-workspace
 
 public
 index.js
+.env

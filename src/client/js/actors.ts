@@ -186,6 +186,7 @@ export class Ship extends Body2d {
 	}
 }
 
+const sizeFactor = 0.2;
 export class Meteor extends Body2d {
 
 	_baseSpeed: number
@@ -360,9 +361,9 @@ export class Meteor extends Body2d {
 
 		context.beginPath();
 
-		context.moveTo(this.shapeSteps[0].x*this.size * 0.34, this.shapeSteps[0].y*this.size * 0.34);
+		context.moveTo(this.shapeSteps[0].x*this.size * sizeFactor, this.shapeSteps[0].y*this.size * sizeFactor);
 		this.shapeSteps.forEach((e) => {
-			context.lineTo(e.x*this.size * 0.34, e.y*this.size * 0.34);
+			context.lineTo(e.x*this.size * sizeFactor, e.y*this.size * sizeFactor);
 		});
 
 		context.closePath();

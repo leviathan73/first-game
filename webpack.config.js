@@ -42,6 +42,7 @@ const configs = [{
 		new CopyPlugin({
 			patterns: [
 			  { from: "./src/server/index.js", to: "../index.js" },
+			  { from: "./src/client/assets/favicon.ico", to: "./favicon.ico" },
 			],
 		  }),
 	],

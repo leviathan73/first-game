@@ -453,13 +453,13 @@ class Gra {
 	}
 
 	private gameOver() {
-		this._dialog.showDialog("game over", true, 1000 * 10);
+		this._dialog.showDialog("game over", true, Infinity);
 		this.freezeAllActors();
 	}
 
 	private resetPlayer() {
 		this._ship.makeGhost(5000);
-		this._dialog.showDialog("shield active", true, Infinity);
+		this._dialog.showDialog("shield active", false, 5000);
 		this._ship.setPosition(this._width / 2, this._height / 2);
 		this._ship.setRadius(10);
 	}

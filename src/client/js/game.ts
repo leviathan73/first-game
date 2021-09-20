@@ -459,7 +459,7 @@ class Gra {
 
 	private resetPlayer() {
 		this._ship.makeGhost(5000);
-		this._dialog.showDialog("shield active", false, 5000);
+		this._dialog.showDialog("shield active", true, Infinity);
 		this._ship.setPosition(this._width / 2, this._height / 2);
 		this._ship.setRadius(10);
 	}

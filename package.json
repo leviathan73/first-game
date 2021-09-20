@@ -6,7 +6,7 @@
   "scripts": {
     "serve": "webpack serve --mode=development",
     "build": "webpack --mode=production",
-	"postbuild": ""
+    "postbuild": ""
   },
   "repository": {
     "type": "git",
@@ -25,6 +25,7 @@
   "devDependencies": {
     "@types/css-font-loading-module": "0.0.6",
     "@types/dat.gui": "^0.7.7",
+    "@types/lodash": "^4.14.173",
     "@types/node": "^16.9.1",
     "@types/three": "0.131.0",
     "buffer": "^6.0.3",
@@ -35,6 +36,7 @@
     "dat.gui": "^0.7.7",
     "file-loader": "^6.2.0",
     "html-webpack-plugin": "5.3.2",
+    "lodash": "^4.17.21",
     "node-polyfill-webpack-plugin": "^1.1.4",
     "postcss": "^8.3.6",
     "three": "0.132.2",

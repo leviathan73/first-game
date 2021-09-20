@@ -1,18 +1,14 @@
 import { Ship, Meteor, Bullet } from "./actors";
 import { Dialog } from "./dialog";
 import { Position, Vector } from "./2dmath";
-import * as THREE from "three";
-import {GUI as DATAGUI} from 'dat.gui';
 import fontAsset from "../assets/Codystar-Regular.ttf"
 import backgroundMusic from "../assets/game-music.mp3"
+import _, { method } from "lodash"
+import * as DGUI from "dat.gui"
 import { Body2d } from "./body2d";
 
-
-// const gui = new DATAGUI({
-// 	autoPlace:true,
-// 	closeOnTop: true,
-// });
-// gui.add(Body2d, '_speedfactor').min(0.001).max(0.5).step(0.025).name("time factor") 
+let controls = new DGUI.GUI()
+controls.add(Body2d, "debug")
 
 const maksZyc: number = 5;
 
@@ -353,10 +349,12 @@ class Gra {
 				this._ship.v.setMagnitude2(this._ship.v.magnitude() * 0.9);
 		} else {
 			//slow deaccelerate
-			if (this._ship.v.magnitude() > 0.01) {
+			if (this._ship.v.magnitude() > 0.0001) {
 				this._speed -= 0.1;
 				if (this._speed < 0) this._speed = 0; //limit
 				this._ship.v.setMagnitude2(this._ship.v.magnitude() * 0.97);
+			} else {
+				
 			}
 		}
 	}
@@ -488,11 +486,44 @@ class Gra {
 			let randomX = Math.random() * this._width;
 			let randomY = Math.random() * this._height;
 
-			meteor.setRadius(60);
+			meteor.setRadius(40);
 			let v = new Vector((Math.random() - 0.5) * 5, (Math.random() - 0.5) * 5);
 
 			let position = new Position(randomX, randomY);
-			position = position.add(v.multiply(-(randomX > randomY ? randomX : randomY)))
+
+			let dx = randomX
+			let dy = randomX
+			let omega = v.angle();
+
+			if(_.inRange(omega, 0, 0.5*Math.PI))
+			{
+				dx = randomX
+				dy = dx*Math.cos(omega)
+				
+			} 
+
+			if(_.inRange(omega, 0.5*Math.PI, Math.PI))
+			{
+				dx = randomX
+				dy = dx*Math.cos(omega)
+			} 
+
+			if(_.inRange(omega, 0, -0.5*Math.PI))
+			{
+				dx = this._width - randomX
+				dy = dx*Math.cos(omega)
+			} 
+
+			if(_.inRange(omega, -0.5*Math.PI, -Math.PI))
+			{
+				dx = this._width - randomX
+				dy = dx*Math.cos(omega)
+			} 
+
+			
+
+			position = position.add(new Vector(dx,dy))
+
 			meteor.setPosition2(
 				position
 			);

@@ -1,3 +1,4 @@
+import _ from "lodash";
 import { Vector, Position, Box, Point } from "./2dmath";
 import { Meteor } from "./actors";
 
@@ -13,7 +14,9 @@ export class Body2d {
   m = 1;
   radius = 10;
   freeze = false;
-  ghost = false
+  ghost = false;
+  
+  static debug = false;
 
   private _lastupdate: number;
 
@@ -126,8 +129,18 @@ export class Body2d {
 	this._lastupdate = performance.now();
   }
 
+drawdebug(context: CanvasRenderingContext2D) {
+	context.font = "12px calibri light"
+	context.fillText(`d angle = ${_.round(this.d.angle(),2)}`,this.p.x+this.radius+15,this.p.y-this.radius-15)
+	context.fillText(`v angle = ${_.round(this.v.angle(),2)}`,this.p.x+this.radius+15,this.p.y-this.radius-2*15)
+	context.fillText(`[x,y] = [${_.round(this.p.x)} , ${_.round(this.p.y,2)}]`,this.p.x+this.radius+15,this.p.y-this.radius-3*15)
+
+}
+
+
   draw(context: CanvasRenderingContext2D) {
-    context.save();
+    if(!Body2d.debug) return;
+	context.save();
     context.beginPath();
     context.arc(
       this.p.x,
@@ -137,15 +150,21 @@ export class Body2d {
       (Math.PI / 180) * 360,
       false
     );
-
-    context.stroke();
-    context.beginPath();
+	context.strokeStyle = "blue";
+	context.fillStyle = "white";
+    context.globalAlpha = 1
+	context.stroke();
+	context.globalAlpha = 0.2
+	context.fill();
+	context.globalAlpha = 1
+    
+	context.beginPath();
     context.strokeStyle = "blue";
     context.moveTo(this.p.x, this.p.y);
     var n = this.d.normalize().multiply(this.radius);
     context.lineTo(this.p.x + n.x, this.p.y + n.y);
     context.stroke();
-    context.save();
+	context.save();
     context.strokeStyle = "yellow";
     var af = this.d
       .normalize()
@@ -155,10 +174,11 @@ export class Body2d {
     context.beginPath();
     context.moveTo(this.p.x + n.x, this.p.y + n.y);
     context.lineTo(afp.x, afp.y);
+	context.strokeStyle = "yellow";
     context.stroke();
     context.restore();
-
-    context.restore();
+	this.drawdebug(context);
+	context.restore();
   }
 
   /**

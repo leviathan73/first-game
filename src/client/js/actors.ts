@@ -3,7 +3,7 @@ import { Body2d } from "./body2d";
 import * as THREE from "three";
 import fireSound from "../assets/gun2.mp3"
 import explosionSound from "../assets/explode.wav"
-import { Clock, FloatType, ShaderMaterial } from "three";
+import _ from "lodash";
 
 const fireAudio = new Audio(fireSound);
 fireAudio.volume = 0.1;
@@ -14,7 +14,6 @@ explosionAudio.volume = 0.1;
 export class Ship extends Body2d {
 	angle: number = Math.PI / 60;
 	mesh!: THREE.Mesh;
-	time: Clock;
 
 	turnLeft() {
 		if (this.freeze == true) return;
@@ -30,69 +29,15 @@ export class Ship extends Body2d {
 	audio = null;
 	constructor() {
 		super();
-		this.time = new THREE.Clock(true)
-		this.time.start();
-		// const geometry = new THREE.ConeGeometry(0.05, 0.1, 30);
-		// const geometry = new THREE.CircleGeometry(2, 10, -0.5 + Math.PI, 0.5);
-	// 	const geometry = new THREE.CircleGeometry(0.4, 5, 0, 2 * Math.PI);
-	// 	const vertex = /* glsl */`
-	// 	#ifdef GL_ES
-	// 		precision highp float;
-	// 	#endif
-
-	// 	uniform float time;
-	// 	uniform vec2 start;
-	// 	varying vec2 vuv;
-		
-
-	// 	void main() {
-	// 		float angle = time*0.0;
-	// 		mat4  rotation = mat4(
-	// 	    vec4( cos(angle), -sin(angle), 0.0,  0.0 ),
-	// 	    vec4( sin(angle), cos(angle),  0.0,  0.0 ),
-	// 	    vec4( 0.0,        0.0,         1.0,  0.0 ),
-	// 	    vec4( 0.0,        0.0,         0.0,  1.0 ));
-	// 		vuv = uv;
-	// 		//gl_PointSize = 1.0;
-	// 	  	gl_Position = projectionMatrix * modelViewMatrix * rotation * vec4(position, 1.0) ;
-	// 	}`
-
-	// 	const fragment = /* glsl */`
-  	// #ifdef GL_ES
-	// 	precision highp float;
-	// #endif
-
-   	// uniform float time;
-	// varying vec2 vuv;
-	
-
-    // void main() {
-	// 	float d = distance(vec2(.5,.5), vuv);
-	// 	// gl_FragColor = vec4(0.6 +.4*sin(time*10.0),0,0,0);
-	// 	float c = 0.4 - 1.8*sin(d);
-	// 	gl_FragColor = vec4(c, c, c, 0);
-    // }`
-
-	// 	const material = new THREE.ShaderMaterial({
-	// 		uniforms: {
-	// 			time: { value: 0 },
-	// 		},
-	// 		vertexShader: vertex,
-	// 		fragmentShader: fragment,
-	// 	});
-
-	// 	this.mesh = new THREE.Mesh(geometry, material);
-	// 	this.mesh.position.set(0, 0, 0.0);
-	// 	this.mesh.visible = false;
 	}
 
 	getMesh() {
 		// return this.mesh;
 	}
 
-	makeGhost(miliseconds:number) {
+	makeGhost(miliseconds: number) {
 		this.ghost = true
-		setTimeout(()=>{
+		setTimeout(() => {
 			this.ghost = false
 		}, miliseconds)
 	}
@@ -105,31 +50,30 @@ export class Ship extends Body2d {
 
 		y *= 2;
 		x *= 2 * aspect;
-
-		// (this.mesh.material as ShaderMaterial).uniforms.time.value = this.time.getElapsedTime();
-		// this.mesh.position.set(x, -y, 0);
 	}
 
 	draw(context: CanvasRenderingContext2D) {
+		
 		context.save();
 
 		var sizeWidth = context.canvas.clientWidth;
 		var sizeHeight = context.canvas.clientHeight;
-		
+
 		context.fillStyle = "white"
 		context.font = "13px Calibri";
-		context.fillText(`${super.getFPSString()}`,sizeWidth-100 ,sizeHeight-20)
-		
+		context.fillText(`${super.getFPSString()}`, sizeWidth - 100, sizeHeight - 20)
+
 		context.translate(this.p.x, this.p.y);
-		
-		
+
+
 		context.rotate(this.d.angle());
 		context.translate(0, -25);
 		this.drawShipBody(context, false);
 		this.drawEngine(context);
-	
+
 		context.restore();
-		//super.draw(context);
+		super.draw(context)
+		
 	}
 
 	drawShipBody(context: CanvasRenderingContext2D, noFill: boolean) {
@@ -141,8 +85,8 @@ export class Ship extends Body2d {
 		context.moveTo(-8, 25);
 		context.lineTo(-8, 10);
 
-		let transparancy = this.ghost?0.5+Math.sin(this.lastupdate/100)*0.2:1
-		context.shadowBlur = 5+transparancy*5;
+		let transparancy = this.ghost ? 0.5 + Math.sin(this.lastupdate / 100) * 0.2 : 1
+		context.shadowBlur = 5 + transparancy * 5;
 		context.shadowColor = `rgba(255,255,255,${transparancy}`
 		context.strokeStyle = `rgba(255,255,255,${transparancy}`
 		context.lineCap = "round";
@@ -177,14 +121,14 @@ export class Ship extends Body2d {
 	}
 
 	drawEngine(context: CanvasRenderingContext2D) {
-		if (this.v.magnitude() > 0) {
+		if (this.v.magnitude() > 0.2) {
 			context.save();
 			context.beginPath();
 			context.moveTo(0, 52);
 			context.lineTo(0, 45);
 
-			let transparancy = 0.8+Math.sin(this.lastupdate/20)*0.2
-			context.shadowBlur = 10+transparancy*5;
+			let transparancy = 0.8 + Math.sin(this.lastupdate / 20) * 0.2
+			context.shadowBlur = 10 + transparancy * 5;
 			context.shadowColor = `rgba(255,255,255,${transparancy}`
 			context.strokeStyle = `rgba(255,255,255,${transparancy}`
 			context.lineWidth = 8;
@@ -207,7 +151,7 @@ export class Meteor extends Body2d {
 
 	_baseSpeed: number
 
-//#region SETUP
+	//#region SETUP
 	constructor(size: number) {
 		super();
 		this.size = size;
@@ -341,7 +285,7 @@ export class Meteor extends Body2d {
 				break;
 		}
 	}
-//#endregion 
+	//#endregion 
 
 	size = 3;
 	explode(shootVector: Vector): Array<Meteor> {
@@ -377,9 +321,9 @@ export class Meteor extends Body2d {
 
 		context.beginPath();
 
-		context.moveTo(this.shapeSteps[0].x*this.size * sizeFactor, this.shapeSteps[0].y*this.size * sizeFactor);
+		context.moveTo(this.shapeSteps[0].x * this.size * sizeFactor, this.shapeSteps[0].y * this.size * sizeFactor);
 		this.shapeSteps.forEach((e) => {
-			context.lineTo(e.x*this.size * sizeFactor, e.y*this.size * sizeFactor);
+			context.lineTo(e.x * this.size * sizeFactor, e.y * this.size * sizeFactor);
 		});
 
 		context.closePath();
@@ -394,6 +338,7 @@ export class Meteor extends Body2d {
 		context.fill();
 
 		context.restore();
+		super.draw(context)
 	}
 }
 
@@ -435,5 +380,22 @@ export class Bullet extends Body2d {
 		context.fill();
 
 		context.restore();
+		super.draw(context);
 	}
+}
+
+export class Ufo extends Body2d {
+
+	constructor() {
+		super();
+	}
+
+	override draw(ctx: CanvasRenderingContext2D) {
+		super.draw(ctx)
+	}
+
+	override update() {
+		super.update()
+	}
+
 }

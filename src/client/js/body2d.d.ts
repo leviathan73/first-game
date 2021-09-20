@@ -12,8 +12,10 @@ export declare class Body2d {
     m: number;
     radius: number;
     freeze: boolean;
+    ghost: boolean;
     private _lastupdate;
-    _speedfactor: number;
+    get lastupdate(): number;
+    static _speedfactor: number;
     private _fps;
     getFPSString(): string;
     constructor();

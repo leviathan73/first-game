@@ -90,6 +90,12 @@ export class Ship extends Body2d {
 		return this.mesh;
 	}
 
+	makeGhost(miliseconds:number) {
+		this.ghost = true
+		setTimeout(()=>{
+			this.ghost = false
+		}, miliseconds)
+	}
 	//TODO 
 	update() {
 		super.update();
@@ -106,9 +112,17 @@ export class Ship extends Body2d {
 
 	draw(context: CanvasRenderingContext2D) {
 		context.save();
-		context.translate(this.p.x, this.p.y);
+
+		var sizeWidth = context.canvas.clientWidth;
+		var sizeHeight = context.canvas.clientHeight;
+		
+		context.fillStyle = "white"
 		context.font = "13px Calibri";
-		context.fillText(`${super.getFPSString()}`, 10,-20)
+		context.fillText(`${super.getFPSString()}`,sizeWidth-100 ,sizeHeight-20)
+		
+		context.translate(this.p.x, this.p.y);
+		
+		
 		context.rotate(this.d.angle());
 		context.translate(0, -25);
 		this.drawShipBody(context, false);
@@ -127,9 +141,10 @@ export class Ship extends Body2d {
 		context.moveTo(-8, 25);
 		context.lineTo(-8, 10);
 
-		context.shadowBlur = 5;
-		context.shadowColor = "white";
-		context.strokeStyle = "white";
+		let transparancy = this.ghost?0.5+Math.sin(this.lastupdate/100)*0.2:1
+		context.shadowBlur = 5+transparancy*5;
+		context.shadowColor = `rgba(255,255,255,${transparancy}`
+		context.strokeStyle = `rgba(255,255,255,${transparancy}`
 		context.lineCap = "round";
 		context.lineWidth = 1;
 		context.stroke();
@@ -147,14 +162,14 @@ export class Ship extends Body2d {
 		context.lineTo(-10, 30);
 		context.closePath();
 
-		context.strokeStyle = "RGBA(250,250,250,1)";
+		context.strokeStyle = `RGBA(250,250,250,${transparancy})`;
 		context.lineWidth = 2;
 		context.stroke();
 
 		if (!noFill) {
-			context.fillStyle = "RGBA(50,50,50,1)";
+			context.fillStyle = `RGBA(50,50,50,${transparancy})`;
 		} else {
-			context.fillStyle = "RGBA(0,0,0,1)";
+			context.fillStyle = `RGBA(0,0,0,${transparancy})`;
 		}
 
 		context.fill();
@@ -168,9 +183,10 @@ export class Ship extends Body2d {
 			context.moveTo(0, 52);
 			context.lineTo(0, 45);
 
-			context.shadowBlur = 10;
-			context.shadowColor = "white";
-			context.strokeStyle = "white";
+			let transparancy = 0.8+Math.sin(this.lastupdate/20)*0.2
+			context.shadowBlur = 10+transparancy*5;
+			context.shadowColor = `rgba(255,255,255,${transparancy}`
+			context.strokeStyle = `rgba(255,255,255,${transparancy}`
 			context.lineWidth = 8;
 			context.lineCap = "round";
 			context.globalAlpha = 0.4;

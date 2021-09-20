@@ -7,6 +7,9 @@ const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 module.exports = (env, argv) => {
 	console.log(argv)
 	if (argv.mode === 'development') {
+		configs[1].optimization = {
+			minimize: false
+		}
 		return configs[1];
 	}
   
@@ -70,6 +73,10 @@ const configs = [{
 
 },{
 	mode: 'development',
+	devtool: 'source-map',
+	devServer: {
+		//writeToDisk: true
+	  },
 	entry: {
 		client: './src/client/start.js',
 	},

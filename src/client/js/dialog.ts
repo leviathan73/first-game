@@ -1,24 +1,56 @@
+import { debug } from "console";
+
 export class Dialog {
 	private _text: string;
 	private _modal: any;
 	private _lasttime: number;
 	private _startTime: number;
+	private _active: boolean;
+	private _maskingDiv: HTMLDivElement = document.createElement("div");
+
+	public get active(): boolean {
+		return this._active;
+	}
+	public set active(value: boolean) {
+		this._active = value;
+	}
+
+	private _cb?: Function;
 	
-	/**
-	 * 
-	 * @param text {string} text to display
-	 * @param isModal {boolean} is dialog freezing rest of the scene
-	 * @param time {number} how long text should be displayes
-	 */
-	constructor(text:string, isModal:boolean, shouldLast: number){
+	constructor(){
+		this._text = ""
+		this._modal = false
+		this._lasttime = 0
+		this._startTime = performance.now();
+		this._active = false
+		this._cb = undefined
+		this._maskingDiv.style.position = "absolute"
+		this._maskingDiv.style.width = "100%"
+		this._maskingDiv.style.height = "100%"
+		this._maskingDiv.style.top = "0"
+		this._maskingDiv.style.left = "0"
+		// this._maskingDiv.style.backgroundColor = "white"
+		// this._maskingDiv.style.opacity = "50%"
+		this._maskingDiv.style.zIndex = "9999"
+		
+		
+		//debugger;
+		document.body.append(this._maskingDiv)		
+		this._maskingDiv.addEventListener("keydown", (e)=>{
+			if(this.active && this._modal) this.active = false;
+		})
+	}
+
+	showDialog(text:string, isModal:boolean, shouldLast: number, cb?: Function) {
 		this._text = text
 		this._modal = isModal
 		this._lasttime = shouldLast
 		this._startTime = performance.now();
-	}
-
-	showModal() {
-
+		this._active = true
+		this._cb = cb
+		this._maskingDiv.style.display = "inline"
+		this._maskingDiv.tabIndex = 0
+		this._maskingDiv.focus();
 	}
 
 	/**
@@ -27,7 +59,7 @@ export class Dialog {
 	drawDialog(context: CanvasRenderingContext2D,w:number,h:number): boolean
 	{
 		const elapsedTime = performance.now() - this._startTime
-		if(elapsedTime <= this._lasttime)
+		if(this._active && (elapsedTime <= this._lasttime || elapsedTime == Infinity))
 		{
 			context.save()
 			context.lineWidth = 1;
@@ -37,8 +69,13 @@ export class Dialog {
 			context.fillText(this._text, w / 2 - textSize.width/2, h / 2 - 25);
 			context.strokeText(this._text, w / 2 - textSize.width/2, h / 2 - 25);
 			context.restore()
+			return this._modal; 
+		} else {
+			this._active = false
+			this._maskingDiv.style.display = "none"
+			if(this._cb) this._cb()
 		}
-		return true;
+		return false;
 	}
 
 }

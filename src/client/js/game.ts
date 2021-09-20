@@ -1,12 +1,20 @@
 import { Ship, Meteor, Bullet } from "./actors";
 import { Dialog } from "./dialog";
-import { Point, Position, Vector } from "./2dmath";
+import { Position, Vector } from "./2dmath";
 import * as THREE from "three";
+import {GUI as DATAGUI} from 'dat.gui';
 import fontAsset from "../assets/Codystar-Regular.ttf"
+import backgroundMusic from "../assets/game-music.mp3"
+import { Body2d } from "./body2d";
 
-console.log(fontAsset)
 
-const maksZyc: number = 3;
+// const gui = new DATAGUI({
+// 	autoPlace:true,
+// 	closeOnTop: true,
+// });
+// gui.add(Body2d, '_speedfactor').min(0.001).max(0.5).step(0.025).name("time factor") 
+
+const maksZyc: number = 5;
 
 interface KEYS {
 	key: boolean
@@ -60,6 +68,7 @@ class Gra {
 	private _starsImageData!: ImageData;
 
 	constructor() {
+		this._dialog = new Dialog()
 		this.setupAll();
 	}
 
@@ -76,7 +85,7 @@ class Gra {
 		this.drawHelp()
 		this.drawPlayground();
 	
-		if (this._dialog?.drawDialog(this.context, this._width, this._height)) {
+		if (!this._dialog?.drawDialog(this.context, this._width, this._height)) {
 			if (!mobileAndTabletCheck()) {
 				this.animateMeteors();
 				this.animateBulltes()
@@ -129,9 +138,25 @@ class Gra {
 		this.setupCanvas();
 		this.setupStars();
 		this.setupPlayer();
-		this.setupMeteors();
-		this._dialog = new Dialog("level 1", false, 2000)
-		this.setupListeners();
+		
+		
+		this._dialog.showDialog("Press any key to start", true, Infinity, ()=>{
+			this.setupListeners();
+			this.setupMeteors();
+			this.setupMusic();
+			this._dialog.showDialog("level 1", false, 2000)
+		}) 
+		
+	}
+	setupMusic() {
+		const backgroundAudio = new Audio(backgroundMusic);
+		backgroundAudio.muted = true;
+		backgroundAudio.volume = 0.02;
+		backgroundAudio.loop = true;
+		backgroundAudio.autoplay = false;
+		backgroundAudio.muted = false;
+		backgroundAudio.play()
+		
 	}
 
 	font!: FontFace;
@@ -404,13 +429,9 @@ class Gra {
 			if (this._ship.checkCollision(meteor)) {
 				this.zycia--;
 				if(this.zycia>0)
-				{
-					this.setupPlayer()
-				} else
-				{
-					this._dialog = new Dialog("game over",true,1000*10)
-					this.freezeAllActors();
-				}
+					this.resetPlayer();
+				 else
+					this.gameOver();
 				return true;
 			}
 
@@ -426,15 +447,28 @@ class Gra {
 		});
 		this._meteors = this._meteors.concat(newMeteors);
 		if (this._meteors.length == 0) {
+			this.resetPlayer();
 			this.nextLevel()
 		}
+	}
+
+	private gameOver() {
+		this._dialog.showDialog("game over", true, 1000 * 10);
+		this.freezeAllActors();
+	}
+
+	private resetPlayer() {
+		this._ship.makeGhost(5000);
+		this._dialog.showDialog("shield active", false, 5000);
+		this._ship.setPosition(this._width / 2, this._height / 2);
+		this._ship.setRadius(10);
 	}
 
 	nextLevel() {
 		console.log(this._level)
 		this._level++
 		this.setupMeteors();
-		this._dialog = new Dialog(`level ${this._level}`, false, 2000)
+		this._dialog.showDialog(`level ${this._level}`, false, 2000)
 	}
 
 	animateBulltes() {

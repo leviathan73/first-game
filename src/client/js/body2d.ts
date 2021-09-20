@@ -13,10 +13,15 @@ export class Body2d {
   m = 1;
   radius = 10;
   freeze = false;
+  ghost = false
 
   private _lastupdate: number;
-	_speedfactor: number;
-	private _fps: number;
+
+  public get lastupdate(): number {
+	return this._lastupdate;
+  }
+  static _speedfactor: number = 0.05;
+  private _fps: number;
 	
 	getFPSString() {
 		return `fps: ${Math.floor(this._fps)}`
@@ -24,7 +29,6 @@ export class Body2d {
   
   constructor() {
 	  this._lastupdate = performance.now();
-	  this._speedfactor = 0.05;
 	  this._fps = 0;
   }
 
@@ -109,8 +113,8 @@ export class Body2d {
 	this._fps =  Math.abs(this._fps - (1000/dt)) > 3?(1000/dt):this._fps;
     // ruch liniowy
     var a = this.a.add(this.f.divide(this.m));
-    this.v = this.v.add(a.multiply(dt*this._speedfactor));
-    this.p = this.p.add(this.v.multiply(dt*this._speedfactor));
+    this.v = this.v.add(a.multiply(dt*Body2d._speedfactor));
+    this.p = this.p.add(this.v.multiply(dt*Body2d._speedfactor));
     
     //ruch obrotowy
     var torque = this.af * this.radius;
@@ -164,6 +168,6 @@ export class Body2d {
    */
   checkCollision(/** @type {Body2d} */ intruder: Meteor) {
     const v = this.p.vectorTo(intruder.p);
-    return v.magnitude() <= this.radius + intruder.radius;
+    return v.magnitude() <= this.radius + intruder.radius && !this.ghost;
   }
 }

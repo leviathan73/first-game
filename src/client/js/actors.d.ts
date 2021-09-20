@@ -11,6 +11,7 @@ export declare class Ship extends Body2d {
     audio: null;
     constructor();
     getMesh(): THREE.Mesh<THREE.BufferGeometry, THREE.Material | THREE.Material[]>;
+    makeGhost(miliseconds: number): void;
     update(): void;
     draw(context: CanvasRenderingContext2D): void;
     drawShipBody(context: CanvasRenderingContext2D, noFill: boolean): void;

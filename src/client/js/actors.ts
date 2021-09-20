@@ -13,7 +13,7 @@ explosionAudio.volume = 0.1;
 
 export class Ship extends Body2d {
 	angle: number = Math.PI / 60;
-	mesh: THREE.Mesh;
+	mesh!: THREE.Mesh;
 	time: Clock;
 
 	turnLeft() {
@@ -34,60 +34,60 @@ export class Ship extends Body2d {
 		this.time.start();
 		// const geometry = new THREE.ConeGeometry(0.05, 0.1, 30);
 		// const geometry = new THREE.CircleGeometry(2, 10, -0.5 + Math.PI, 0.5);
-		const geometry = new THREE.CircleGeometry(0.4, 5, 0, 2 * Math.PI);
-		const vertex = /* glsl */`
-		#ifdef GL_ES
-			precision highp float;
-		#endif
+	// 	const geometry = new THREE.CircleGeometry(0.4, 5, 0, 2 * Math.PI);
+	// 	const vertex = /* glsl */`
+	// 	#ifdef GL_ES
+	// 		precision highp float;
+	// 	#endif
 
-		uniform float time;
-		uniform vec2 start;
-		varying vec2 vuv;
+	// 	uniform float time;
+	// 	uniform vec2 start;
+	// 	varying vec2 vuv;
 		
 
-		void main() {
-			float angle = time*0.0;
-			mat4  rotation = mat4(
-		    vec4( cos(angle), -sin(angle), 0.0,  0.0 ),
-		    vec4( sin(angle), cos(angle),  0.0,  0.0 ),
-		    vec4( 0.0,        0.0,         1.0,  0.0 ),
-		    vec4( 0.0,        0.0,         0.0,  1.0 ));
-			vuv = uv;
-			//gl_PointSize = 1.0;
-		  	gl_Position = projectionMatrix * modelViewMatrix * rotation * vec4(position, 1.0) ;
-		}`
+	// 	void main() {
+	// 		float angle = time*0.0;
+	// 		mat4  rotation = mat4(
+	// 	    vec4( cos(angle), -sin(angle), 0.0,  0.0 ),
+	// 	    vec4( sin(angle), cos(angle),  0.0,  0.0 ),
+	// 	    vec4( 0.0,        0.0,         1.0,  0.0 ),
+	// 	    vec4( 0.0,        0.0,         0.0,  1.0 ));
+	// 		vuv = uv;
+	// 		//gl_PointSize = 1.0;
+	// 	  	gl_Position = projectionMatrix * modelViewMatrix * rotation * vec4(position, 1.0) ;
+	// 	}`
 
-		const fragment = /* glsl */`
-  	#ifdef GL_ES
-		precision highp float;
-	#endif
+	// 	const fragment = /* glsl */`
+  	// #ifdef GL_ES
+	// 	precision highp float;
+	// #endif
 
-   	uniform float time;
-	varying vec2 vuv;
+   	// uniform float time;
+	// varying vec2 vuv;
 	
 
-    void main() {
-		float d = distance(vec2(.5,.5), vuv);
-		// gl_FragColor = vec4(0.6 +.4*sin(time*10.0),0,0,0);
-		float c = 0.4 - 1.8*sin(d);
-		gl_FragColor = vec4(c, c, c, 0);
-    }`
+    // void main() {
+	// 	float d = distance(vec2(.5,.5), vuv);
+	// 	// gl_FragColor = vec4(0.6 +.4*sin(time*10.0),0,0,0);
+	// 	float c = 0.4 - 1.8*sin(d);
+	// 	gl_FragColor = vec4(c, c, c, 0);
+    // }`
 
-		const material = new THREE.ShaderMaterial({
-			uniforms: {
-				time: { value: 0 },
-			},
-			vertexShader: vertex,
-			fragmentShader: fragment,
-		});
+	// 	const material = new THREE.ShaderMaterial({
+	// 		uniforms: {
+	// 			time: { value: 0 },
+	// 		},
+	// 		vertexShader: vertex,
+	// 		fragmentShader: fragment,
+	// 	});
 
-		this.mesh = new THREE.Mesh(geometry, material);
-		this.mesh.position.set(0, 0, 0.0);
-		this.mesh.visible = false;
+	// 	this.mesh = new THREE.Mesh(geometry, material);
+	// 	this.mesh.position.set(0, 0, 0.0);
+	// 	this.mesh.visible = false;
 	}
 
 	getMesh() {
-		return this.mesh;
+		// return this.mesh;
 	}
 
 	makeGhost(miliseconds:number) {
@@ -106,8 +106,8 @@ export class Ship extends Body2d {
 		y *= 2;
 		x *= 2 * aspect;
 
-		(this.mesh.material as ShaderMaterial).uniforms.time.value = this.time.getElapsedTime();
-		this.mesh.position.set(x, -y, 0);
+		// (this.mesh.material as ShaderMaterial).uniforms.time.value = this.time.getElapsedTime();
+		// this.mesh.position.set(x, -y, 0);
 	}
 
 	draw(context: CanvasRenderingContext2D) {

@@ -257,7 +257,7 @@ class Gra {
 		this._ship = new Ship();
 		this._ship.setPosition(this._width / 2, this._height / 2);
 		this._ship.setRadius(10);
-		this._scene.add(this._ship.getMesh());
+		//this._scene.add(this._ship.getMesh());
 	}
 
 	_bulletGeneratorInterval!: number;

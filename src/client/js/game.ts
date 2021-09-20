@@ -184,28 +184,28 @@ class Gra {
 			this.setupStars()
 		})
 
-		this._scene = new THREE.Scene();
-		this._camera = new THREE.PerspectiveCamera(
-			90,
-			this._width / this._height,
-			0.1,
-			1000
-		);
-		this._renderer = new THREE.WebGLRenderer({
-			alpha: true,
-			canvas: this._canvas3D!,
-		});
-		this._renderer.setSize(this._width, this._height);
-		const geometry = new THREE.IcosahedronGeometry(1, 0);
-		const material = new THREE.MeshPhongMaterial({ color: 0xff00ff });
-		const cube = new THREE.Mesh(geometry, material);
-		const light1 = new THREE.PointLight(0xffffff, 0.5, 100);
+		// this._scene = new THREE.Scene();
+		// this._camera = new THREE.PerspectiveCamera(
+		// 	90,
+		// 	this._width / this._height,
+		// 	0.1,
+		// 	1000
+		// );
+		// this._renderer = new THREE.WebGLRenderer({
+		// 	alpha: true,
+		// 	canvas: this._canvas3D!,
+		// });
+		// this._renderer.setSize(this._width, this._height);
+		// const geometry = new THREE.IcosahedronGeometry(1, 0);
+		// const material = new THREE.MeshPhongMaterial({ color: 0xff00ff });
+		// const cube = new THREE.Mesh(geometry, material);
+		// const light1 = new THREE.PointLight(0xffffff, 0.5, 100);
 
-		/*calculate*/
-		this._scene.add(light1);
-		// this.scene.add(cube);
-		this._camera.position.set(0, 0, 1);
-		light1.position.set(0, 0, 5);
+		// /*calculate*/
+		// this._scene.add(light1);
+		// // this.scene.add(cube);
+		// this._camera.position.set(0, 0, 1);
+		// light1.position.set(0, 0, 5);
 	}
 
 	starsPath!: Path2D;

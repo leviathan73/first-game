@@ -24,7 +24,7 @@ export class Ship extends Body2d {
 	turnRight() {
 		if (this.freeze == true) return;
 		this.d.rotate2(this.angle);
-		this.mesh.rotateZ(-this.angle);
+		//this.mesh.rotateZ(-this.angle);
 	}
 
 	audio = null;

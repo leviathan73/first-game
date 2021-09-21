@@ -29,12 +29,8 @@ export class Dialog {
 		this._maskingDiv.style.height = "100%"
 		this._maskingDiv.style.top = "0"
 		this._maskingDiv.style.left = "0"
-		// this._maskingDiv.style.backgroundColor = "white"
-		// this._maskingDiv.style.opacity = "50%"
 		this._maskingDiv.style.zIndex = "9999"
 		
-		
-		//debugger;
 		document.body.append(this._maskingDiv)		
 		this._maskingDiv.addEventListener("keydown", (e)=>{
 			if(this.active && this._modal) this.active = false;

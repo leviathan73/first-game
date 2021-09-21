@@ -15,6 +15,7 @@ export class Body2d {
   radius = 10;
   freeze = false;
   private _ghost = false;
+  dt: number = 0
 
   public get ghost() {
 		return this._ghost;
@@ -32,7 +33,7 @@ export class Body2d {
   public get lastupdate(): number {
 	return this._lastupdate;
   }
-  static _speedfactor: number = 0.05;
+  static speedfactor: number = 0.05;
   private _fps: number;
 	
 	getFPSString() {
@@ -120,19 +121,19 @@ export class Body2d {
   }
 
   update() {
-	const dt = performance.now() - this._lastupdate;
-	this._fps =  Math.abs(this._fps - (1000/dt)) > 3?(1000/dt):this._fps;
+	this.dt = performance.now() - this._lastupdate;
+	this._fps =  Math.abs(this._fps - (1000/this.dt)) > 3?(1000/this.dt):this._fps;
     // ruch liniowy
     var a = this.a.add(this.f.divide(this.m));
-    this.v = this.v.add(a.multiply(dt*Body2d._speedfactor));
-    this.p = this.p.add(this.v.multiply(dt*Body2d._speedfactor));
+    this.v = this.v.add(a.multiply(this.dt*Body2d.speedfactor));
+    this.p = this.p.add(this.v.multiply(this.dt*Body2d.speedfactor));
     
     //ruch obrotowy
     var torque = this.af * this.radius;
     var inertia = 0.5 * this.m * this.radius * this.radius; //tylko dla pelnego walca. inne ksztalty powinny miec inny wzór
 
     var aa = this.aa + torque / inertia;
-    this.omega += aa;
+    this.omega += aa*this.dt*Body2d.speedfactor;
     this.d.rotate2(this.omega);
 	this._lastupdate = performance.now();
   }
@@ -194,8 +195,9 @@ drawdebug(context: CanvasRenderingContext2D) {
    * @param {Body2d} intruder
    * @returns {boolean}
    */
-  checkCollision(/** @type {Body2d} */ intruder: Meteor) {
-    const v = this.p.vectorTo(intruder.p);
-    return v.magnitude() <= this.radius + intruder.radius && !this.ghost;
+  checkCollision(/** @type {Body2d} */ intruder: Body2d) {
+    if(this.ghost || intruder.ghost) return false;
+	const v = this.p.vectorTo(intruder.p);
+    return v.magnitude() <= this.radius + intruder.radius;
   }
 }

@@ -12,7 +12,10 @@ export declare class Body2d {
     m: number;
     radius: number;
     freeze: boolean;
-    ghost: boolean;
+    private _ghost;
+    get ghost(): boolean;
+    set ghost(value: boolean);
+    static debug: boolean;
     private _lastupdate;
     get lastupdate(): number;
     static _speedfactor: number;
@@ -49,6 +52,7 @@ export declare class Body2d {
     setVelocity2(v: Vector): void;
     setMass(m: number): void;
     update(): void;
+    drawdebug(context: CanvasRenderingContext2D): void;
     draw(context: CanvasRenderingContext2D): void;
     /**
      *

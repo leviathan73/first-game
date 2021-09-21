@@ -435,14 +435,12 @@ export class Bullet extends Body2d {
 
 export class Ufo extends Body2d {
 	
-	private _bullets: Bullet[] = [];
-
 	shootAt(p: Position) {
 		const bullet = new Bullet()
 		const v = this.p.vectorTo(p).setMagnitude(3)
 		bullet.setVelocity2(v)
 		bullet.setPosition2(this.p)
-		this._bullets.push(bullet)
+		return bullet
 	}
 
 	startUfo(_canvasWidth: number, _canvasHeight: number) {
@@ -466,8 +464,6 @@ export class Ufo extends Body2d {
 		ufoAudio.play()
 
 	}
-
-	bullets: Bullet[] = [];
 
 	 constructor(time: number) {
 		super();
@@ -511,14 +507,6 @@ export class Ufo extends Body2d {
 
 	override update() {
 		super.update()
-	}
-
-	animateBulets(ctx:CanvasRenderingContext2D) {
-		this._bullets.filter((bullet)=>{
-			bullet.update()
-			bullet.draw(ctx)
-			return !bullet.p.inBox(0,0, ctx.canvas.clientWidth, ctx.canvas.clientHeight)
-		})
 	}
 
 	stopUfo()

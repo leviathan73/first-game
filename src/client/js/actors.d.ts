@@ -1,16 +1,14 @@
-import { Vector } from "./2dmath";
+import { Position, Vector } from "./2dmath";
 import { Body2d } from "./body2d";
 import * as THREE from "three";
-import { Clock } from "three";
 export declare class Ship extends Body2d {
     angle: number;
     mesh: THREE.Mesh;
-    time: Clock;
     turnLeft(): void;
     turnRight(): void;
     audio: null;
     constructor();
-    getMesh(): THREE.Mesh<THREE.BufferGeometry, THREE.Material | THREE.Material[]>;
+    getMesh(): void;
     makeGhost(miliseconds: number): void;
     update(): void;
     draw(context: CanvasRenderingContext2D): void;
@@ -38,6 +36,7 @@ export declare class Meteor extends Body2d {
         x: number;
         y: number;
     }[];
+    randomizeInitialParams(w: number, h: number): void;
     setRadius(r: number): void;
     generateShape(): void;
     size: number;
@@ -45,8 +44,18 @@ export declare class Meteor extends Body2d {
     draw(context: CanvasRenderingContext2D): void;
 }
 export declare class Bullet extends Body2d {
-    ghost: boolean;
     constructor();
     draw(context: CanvasRenderingContext2D): void;
+}
+export declare class Ufo extends Body2d {
+    private _bullets;
+    shootAt(p: Position): void;
+    startUfo(_canvasWidth: number, _canvasHeight: number): void;
+    bullets: Bullet[];
+    constructor(time: number);
+    draw(ctx: CanvasRenderingContext2D): void;
+    update(): void;
+    animateBulets(ctx: CanvasRenderingContext2D): void;
+    stopUfo(): void;
 }
 //# sourceMappingURL=actors.d.ts.map

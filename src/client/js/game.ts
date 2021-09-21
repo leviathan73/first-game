@@ -61,6 +61,8 @@ class Gra {
 
 	private _ship!: Ship;
 	private _shipBullets: Bullet[] = [];
+	private _ufoBullets: Bullet[] = [];
+
 	private _meteors: Meteor[] = [];
 	private _ufo!: Ufo;
 
@@ -80,129 +82,6 @@ class Gra {
 	constructor() {
 		this._dialog = new Dialog()
 		this.setupAll();
-	}
-
-	render3D() {
-		this._renderer.render(this._scene, this._camera);
-	}
-
-	render2D() {
-		this.clearCanvas(); // 3a
-		// this.context.putImageData(this.starsImageData, 100, 100);
-		this.drawBoard();
-
-		if (!this._dialog?.drawDialog(this._context, this._canvasWidth, this._canvasHeight)) {
-			if (this._freeze) return
-			this.animateMeteors();
-			this.animateBulltes()
-			this.animatePlayer();
-			this.animateUfo();
-		}
-	}
-
-	clearCanvas() {
-		this._context.strokeStyle = "white";
-		this._context.fillStyle = "#DDDDDD";
-		this._context.clearRect(0, 0, this._canvasWidth, this._canvasHeight);
-	}
-
-	animatePlayer() {
-		this.accelerateShip();
-		this.turnShip();
-		this._ship.update();
-		this.keepOnScreen(this._ship);
-		this._ship.draw(this._context);
-	}
-
-	animateBulltes() {
-		//clear bullets outside the view
-		this._shipBullets = this._shipBullets.filter((bullet) => {
-			bullet.update();
-			bullet.draw(this._context);
-			return bullet.p.inBox(0, 0, this._canvasWidth, this._canvasHeight);
-		});
-	}
-
-	animateMeteors() {
-		let newMeteors: Meteor[] = [];
-		this._meteors = this._meteors.filter((meteor) => {
-			meteor.update();
-			this.keepOnScreen(meteor);
-			meteor.draw(this._context);
-
-			if (this._ship.checkCollision(meteor)) {
-				this.zycia--;
-				if (this.zycia > 0)
-					this.resetPlayer();
-				else
-					this.gameOver();
-				return true;
-			}
-
-			for (const bullet of this._shipBullets) {
-				if (!bullet.ghost && bullet.checkCollision(meteor)) {
-					bullet.ghost = true;
-					newMeteors.push(...meteor.explode(bullet.d));
-					this._punktacja += 10;
-					return false;
-				}
-			}
-			return true;
-		});
-		this._meteors = this._meteors.concat(newMeteors);
-		if (this._meteors.length == 0) {
-			this.resetPlayer();
-			this.nextLevel()
-		}
-	}
-
-	animateUfo() {
-		if (!this._ufo.ghost) {
-			this._ufo.update()
-			this.keepOnScreen(this._ufo)
-			this._ufo.draw(this._context)
-			this._ufo.animateBulets(this._context)
-			if(!this._ufo.p.inBox(0,0, this._canvasWidth, this._canvasHeight)){
-				clearInterval(this._bulletGeneratorInterval)
-				this._ufo?.stopUfo()
-			}
-		}
-	}
-
-	drawBoard() {
-		this.drawStars();
-		this.drawScore();
-		this.drawLives();
-		this.drawHelp();
-		this.drawPlayground();
-	}
-
-	drawStars() {
-		this._context.globalAlpha = 0.5;
-		this._context.fill(this.starsPath);
-		this._context.globalAlpha = 1;
-	}
-
-	drawPlayground() {
-		this._context.save();
-		this.drawGridLines("#333333");
-		this._context.restore();
-	}
-
-	drawGridLines(color: string | CanvasGradient | CanvasPattern) {
-		this._context.save();
-		this._context.translate(5, 5);
-
-		this._context.beginPath();
-		this._context.strokeStyle = color;
-		for (let i = 0; i < 100; i++) {
-			this._context.moveTo(-10000, i * 100);
-			this._context.lineTo(10000, i * 100);
-			this._context.moveTo(i * 100, -10000);
-			this._context.lineTo(i * 100, 10000);
-		}
-		this._context.stroke();
-		this._context.restore();
 	}
 
 	setupAll() {
@@ -234,15 +113,14 @@ class Gra {
 	sendUfo() {
 		setInterval(() => {
 			this._ufo.startUfo(this._canvasWidth, this._canvasHeight)
-			this._ufo.shootAt(this._ship.p)
+			this._ufoBullets.push(this._ufo.shootAt(this._ship.p))
 			clearInterval(this._ufoGunInterval)
 			this._ufoGunInterval = window.setInterval(() => {
 				if(!this._ufo.ghost)
-					this._ufo.shootAt(this._ship.p)
+				this._ufoBullets.push(this._ufo.shootAt(this._ship.p))
 			}, 2 * 1000)
 		}, 30 * 1000)
 	}
-
 
 	setupMusic() {
 		const backgroundAudio = new Audio(backgroundMusic);
@@ -328,7 +206,152 @@ class Gra {
 	setupPlayer() {
 		this._ship = new Ship();
 		this._ship.setPosition(this._canvasWidth / 2, this._canvasHeight / 2);
-		//this._scene.add(this._ship.getMesh());
+	}
+
+
+	render3D() {
+		this._renderer.render(this._scene, this._camera);
+	}
+
+	render2D() {
+		this.clearCanvas(); // 3a
+		this.drawBoard();
+
+		if (!this._dialog?.drawDialog(this._context, this._canvasWidth, this._canvasHeight)) {
+			if (this._freeze) return
+			this.animateMeteors();
+			this.animateBulltes()
+			this.animatePlayer();
+			this.animateUfoBulets()
+			this.animateUfo();
+		}
+	}
+
+	clearCanvas() {
+		this._context.strokeStyle = "white";
+		this._context.fillStyle = "#DDDDDD";
+		this._context.clearRect(0, 0, this._canvasWidth, this._canvasHeight);
+	}
+
+	animatePlayer() {
+		this.accelerateShip();
+		this.turnShip();
+		this._ship.update();
+		this.keepOnScreen(this._ship);
+		this._ship.draw(this._context);
+	}
+
+	animateBulltes() {
+		//clear bullets outside the view
+		this._shipBullets = this._shipBullets.filter((bullet) => {
+			bullet.update();
+			bullet.draw(this._context);
+			return bullet.p.inBox(0, 0, this._canvasWidth, this._canvasHeight);
+		});
+	}
+
+	animateMeteors() {
+		let newMeteors: Meteor[] = [];
+		this._meteors = this._meteors.filter((meteor) => {
+			let keepMeteor = true
+			meteor.update();
+			this.keepOnScreen(meteor);
+			meteor.draw(this._context);
+
+			if (this._ship.checkCollision(meteor)) {
+				this.playerCrashed();
+				keepMeteor = false;
+			}
+
+			for (let bullet of this._shipBullets) {
+				if (bullet.checkCollision(meteor)) {
+					bullet.ghost = true;
+					newMeteors.push(...meteor.explode(bullet.d));
+					this._punktacja += 10;
+					keepMeteor = false
+				}
+
+				if (bullet.checkCollision(this._ufo)) {
+					bullet.ghost = true;
+					clearInterval(this._bulletGeneratorInterval)
+					this._ufo.stopUfo()
+					this._punktacja += 200;
+				}
+			};
+			return keepMeteor;
+		});
+		this._meteors = this._meteors.concat(newMeteors);
+		if (this._meteors.length == 0) {
+			this.nextLevel()
+		}
+	}
+
+	private playerCrashed() {
+		this.zycia--;
+		if (this.zycia > 0)
+			this.resetPlayer();
+		else
+			this.gameOver();
+	}
+
+	animateUfoBulets() {
+		this._ufoBullets.filter((bullet)=>{
+			bullet.update()
+			bullet.draw(this._context)
+			if(bullet.checkCollision(this._ship)) {
+				this.playerCrashed();
+				return true
+			}
+			return !bullet.p.inBox(0,0, this._canvasWidth, this._canvasWidth)
+		})
+	}
+
+	animateUfo() {
+		if (!this._ufo.ghost) {
+			this._ufo.update()
+			this.keepOnScreen(this._ufo)
+			this._ufo.draw(this._context)
+			if(!this._ufo.p.inBox(0,0, this._canvasWidth, this._canvasHeight)){
+				clearInterval(this._bulletGeneratorInterval)
+				this._ufo?.stopUfo()
+			}
+		}
+	}
+
+	drawBoard() {
+		this.drawStars();
+		this.drawScore();
+		this.drawLives();
+		this.drawHelp();
+		this.drawPlayground();
+	}
+
+	drawStars() {
+		this._context.globalAlpha = 0.5;
+		this._context.fill(this.starsPath);
+		this._context.globalAlpha = 1;
+	}
+
+	drawPlayground() {
+		this._context.save();
+		this.drawGridLines("#333333");
+		this._context.restore();
+	}
+
+	drawGridLines(color: string | CanvasGradient | CanvasPattern) {
+		this._context.save();
+		this._context.translate(5, 5);
+
+		this._context.beginPath();
+		this._context.strokeStyle = color;
+		for (let i = 0; i < 100; i++) {
+			this._context.moveTo(-10000, i * 100);
+			this._context.lineTo(10000, i * 100);
+			this._context.moveTo(i * 100, -10000);
+			this._context.lineTo(i * 100, 10000);
+		}
+		this._context.stroke();
+		this._context.restore();
 	}
 
 	_bulletGeneratorInterval!: number;
@@ -413,7 +436,7 @@ class Gra {
 		//accelerate
 		if (this._keys["ArrowUp"]) {
 			//accelerate
-			this._speed += 0.5;
+			this._speed += 0.5 * this._ship.dt * Body2d.speedfactor;
 			if (this._speed >= 5) this._speed = 5; //limit
 			this._ship.setVelocity2(
 				this._ship.v.add(this._ship.d.setMagnitude(this._speed / 100))
@@ -478,12 +501,12 @@ class Gra {
 		this._context.restore();
 	}
 
-	private gameOver() {
+	gameOver() {
 		this._dialog.showDialog("game over", true, Infinity);
 		this.freezeAllActors();
 	}
 
-	private resetPlayer() {
+	resetPlayer() {
 		this._ship.makeGhost(5000);
 		this._dialog.showDialog("shield active", false, 5000);
 		this._ship.setPosition(this._canvasWidth / 2, this._canvasHeight / 2);

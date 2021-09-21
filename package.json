@@ -28,6 +28,8 @@
     "@types/lodash": "^4.14.173",
     "@types/node": "^16.9.1",
     "@types/three": "0.131.0",
+    "@types/animejs": "3.1.4",
+    "animejs": "^3.2.1",
     "buffer": "^6.0.3",
     "clean-webpack-plugin": "^4.0.0",
     "copy-webpack-plugin": "^9.0.1",

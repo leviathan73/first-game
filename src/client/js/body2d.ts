@@ -14,7 +14,16 @@ export class Body2d {
   m = 1;
   radius = 10;
   freeze = false;
-  ghost = false;
+  private _ghost = false;
+
+  public get ghost() {
+		return this._ghost;
+	}
+
+	public set ghost(value) {
+		this._ghost = value;
+		this._lastupdate = performance.now();
+	}
   
   static debug = false;
 
@@ -111,7 +120,6 @@ export class Body2d {
   }
 
   update() {
-    if (this.freeze) return;
 	const dt = performance.now() - this._lastupdate;
 	this._fps =  Math.abs(this._fps - (1000/dt)) > 3?(1000/dt):this._fps;
     // ruch liniowy

@@ -1,8 +1,11 @@
-import { Vector } from "./2dmath";
+import { Position, Vector } from "./2dmath";
 import { Body2d } from "./body2d";
 import * as THREE from "three";
 import fireSound from "../assets/gun2.mp3"
 import explosionSound from "../assets/explode.wav"
+import ufoSound from "../assets/ufo.mp3"
+import anime from "animejs";
+
 import _ from "lodash";
 
 const fireAudio = new Audio(fireSound);
@@ -10,6 +13,10 @@ fireAudio.volume = 0.1;
 
 const explosionAudio = new Audio(explosionSound);
 explosionAudio.volume = 0.1;
+
+const ufoAudio = new Audio(ufoSound);
+ufoAudio.volume = 0.1;
+
 
 export class Ship extends Body2d {
 	angle: number = Math.PI / 60;
@@ -29,6 +36,7 @@ export class Ship extends Body2d {
 	audio = null;
 	constructor() {
 		super();
+		this.setRadius(20);
 	}
 
 	getMesh() {
@@ -53,7 +61,7 @@ export class Ship extends Body2d {
 	}
 
 	draw(context: CanvasRenderingContext2D) {
-		
+
 		context.save();
 
 		var sizeWidth = context.canvas.clientWidth;
@@ -73,7 +81,7 @@ export class Ship extends Body2d {
 
 		context.restore();
 		super.draw(context)
-		
+
 	}
 
 	drawShipBody(context: CanvasRenderingContext2D, noFill: boolean) {
@@ -266,6 +274,46 @@ export class Meteor extends Body2d {
 		{ x: -44.25518109436087, y: -14.379379997911935 },
 	];
 
+	randomizeInitialParams(w: number, h: number) {
+		let randomX = Math.random() * w;
+		let randomY = Math.random() * h;
+		this.setRadius(40);
+		let v = new Vector((Math.random() - 0.5) * 5, (Math.random() - 0.5) * 5);
+
+		let position = new Position(randomX, randomY);
+
+		let dx = randomX;
+		let dy = randomY;
+		let omega = v.angle();
+
+		if (_.inRange(omega, 0, 0.5 * Math.PI)) {
+			dx = randomX;
+			dy = dx * Math.cos(omega);
+
+		}
+
+		if (_.inRange(omega, 0.5 * Math.PI, Math.PI)) {
+			dx = randomX;
+			dy = dx * Math.cos(omega);
+		}
+
+		if (_.inRange(omega, 0, -0.5 * Math.PI)) {
+			dx = w - randomX;
+			dy = dx * Math.cos(omega);
+		}
+
+		if (_.inRange(omega, -0.5 * Math.PI, -Math.PI)) {
+			dx = w - randomX;
+			dy = dx * Math.cos(omega);
+		}
+
+		position = position.add(new Vector(dx, dy));
+		this.setPosition2(position);
+		v = v.setMagnitude(2);
+		this.setVelocity2(v);
+		this.setDirection2(v);
+	}
+
 	setRadius(r: number) {
 		super.setRadius(r);
 		this.generateShape();
@@ -343,10 +391,11 @@ export class Meteor extends Body2d {
 }
 
 export class Bullet extends Body2d {
-	ghost: boolean = false;
 
 	constructor() {
 		super();
+		ufoAudio.autoplay = false;
+		ufoAudio.loop = false;
 		this.setRadius(3);
 	}
 
@@ -385,12 +434,78 @@ export class Bullet extends Body2d {
 }
 
 export class Ufo extends Body2d {
+	
+	private _bullets: Bullet[] = [];
 
-	constructor() {
+	shootAt(p: Position) {
+		const bullet = new Bullet()
+		const v = this.p.vectorTo(p).setMagnitude(3)
+		bullet.setVelocity2(v)
+		bullet.setPosition2(this.p)
+		this._bullets.push(bullet)
+	}
+
+	startUfo(_canvasWidth: number, _canvasHeight: number) {
+		this.ghost = false
+
+		let randomX = (0.1+Math.random()) * _canvasWidth;
+		let randomY = (0.1+Math.random()) * _canvasHeight;
+
+		randomX = randomX > 0.5 * _canvasWidth ? _canvasWidth : 0
+			let position = new Position(randomX, randomY);
+
+		let v = position.vectorTo({
+			x: randomX==0?_canvasWidth:0,
+			y: Math.random() * _canvasHeight/2
+		}).setMagnitude(2)
+
+		this.setPosition2(position);
+		this.setVelocity2(v);
+		this.setDirection2(v);
+
+		ufoAudio.play()
+
+	}
+
+	bullets: Bullet[] = [];
+
+	 constructor(time: number) {
 		super();
+		this.ghost = true;
+		this.setRadius(40);
 	}
 
 	override draw(ctx: CanvasRenderingContext2D) {
+		if(this.ghost) return
+		ctx.save()
+		ctx.translate(this.p.x, this.p.y)
+		//ctx.rotate(this.d.angle())
+		ctx.strokeStyle = "white";
+		ctx.lineWidth = 2;
+		ctx.shadowBlur = 5;
+		ctx.shadowColor = "white";
+		ctx.fillStyle = "RGBA(40,40,40,1)";
+
+		ctx.beginPath()
+		ctx.ellipse(0, -5, 10, 8, 0, 0, 2 * Math.PI);
+		ctx.moveTo(5, -1);
+		// ctx.beginPath()
+		ctx.ellipse(0, 6, 20, 5, 0, 0, 2 * Math.PI);
+		// ctx.beginPath()
+		ctx.moveTo(15, 0);
+		ctx.ellipse(0, 0, 30, 8, 0, 0, 2 * Math.PI);
+		ctx.stroke();
+		ctx.fill();
+
+		ctx.beginPath()
+		ctx.ellipse(0, 0, 4, 4, 0, 0, 2 * Math.PI);
+		ctx.lineWidth = 1;
+		ctx.shadowBlur = 2;
+
+		ctx.stroke();
+
+		
+		ctx.restore()
 		super.draw(ctx)
 	}
 
@@ -398,4 +513,22 @@ export class Ufo extends Body2d {
 		super.update()
 	}
 
+	animateBulets(ctx:CanvasRenderingContext2D) {
+		this._bullets.filter((bullet)=>{
+			bullet.update()
+			bullet.draw(ctx)
+			return !bullet.p.inBox(0,0, ctx.canvas.clientWidth, ctx.canvas.clientHeight)
+		})
+	}
+
+	stopUfo()
+	{
+		anime({
+			targets: ufoAudio,
+			volume: 0,
+			easing: 'linear'
+		}).play();
+
+		this.ghost = true;
+	}
 }

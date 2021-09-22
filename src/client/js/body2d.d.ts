@@ -1,5 +1,4 @@
 import { Vector, Position } from "./2dmath";
-import { Meteor } from "./actors";
 export declare class Body2d {
     p: Position;
     v: Vector;
@@ -13,12 +12,13 @@ export declare class Body2d {
     radius: number;
     freeze: boolean;
     private _ghost;
+    dt: number;
     get ghost(): boolean;
     set ghost(value: boolean);
     static debug: boolean;
     private _lastupdate;
     get lastupdate(): number;
-    static _speedfactor: number;
+    static speedfactor: number;
     private _fps;
     getFPSString(): string;
     constructor();
@@ -59,6 +59,6 @@ export declare class Body2d {
      * @param {Body2d} intruder
      * @returns {boolean}
      */
-    checkCollision(/** @type {Body2d} */ intruder: Meteor): boolean;
+    checkCollision(/** @type {Body2d} */ intruder: Body2d): boolean;
 }
 //# sourceMappingURL=body2d.d.ts.map

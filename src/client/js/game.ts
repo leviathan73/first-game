@@ -36,6 +36,7 @@ class Gra {
 	private _level: number = 1;
 	private _dialog!: Dialog;
 	private _ufoGunInterval!: number;
+	private _ufoInterval!: number;
 
 	get zycia(): number {
 		return this._zycia;
@@ -111,13 +112,17 @@ class Gra {
 	}
 
 	sendUfo() {
-		setInterval(() => {
+		clearInterval(this._ufoInterval)
+		this._ufoInterval = window.setInterval(() => {
 			this._ufo.startUfo(this._canvasWidth, this._canvasHeight)
 			this._ufoBullets.push(this._ufo.shootAt(this._ship.p))
+
 			clearInterval(this._ufoGunInterval)
+			
 			this._ufoGunInterval = window.setInterval(() => {
-				if(!this._ufo.ghost)
-				this._ufoBullets.push(this._ufo.shootAt(this._ship.p))
+			
+				if(!this._ufo.ghost) this._ufoBullets.push(this._ufo.shootAt(this._ship.p))
+			
 			}, 2 * 1000)
 		}, 30 * 1000)
 	}
@@ -208,6 +213,15 @@ class Gra {
 		this._ship.setPosition(this._canvasWidth / 2, this._canvasHeight / 2);
 	}
 
+	setupMeteors() {
+		console.log("setupMeteors " + this._level);
+		for (let i = 0; i < this._level; i++) {
+			console.log("setupMeteors");
+			const meteor = new Meteor(3);
+			meteor.randomizeInitialParams(this._canvasWidth, this._canvasHeight)
+			this._meteors.push(meteor);
+		}
+	}
 
 	render3D() {
 		this._renderer.render(this._scene, this._camera);
@@ -220,10 +234,11 @@ class Gra {
 		if (!this._dialog?.drawDialog(this._context, this._canvasWidth, this._canvasHeight)) {
 			if (this._freeze) return
 			this.animateMeteors();
-			this.animateBulltes()
 			this.animatePlayer();
-			this.animateUfoBulets()
+			this.animateBulltes()
+			
 			this.animateUfo();
+			this.animateUfoBulets()
 		}
 	}
 
@@ -260,6 +275,8 @@ class Gra {
 
 			if (this._ship.checkCollision(meteor)) {
 				this.playerCrashed();
+				newMeteors.push(...meteor.explode(this._ship.d));
+				this._punktacja += 10;
 				keepMeteor = false;
 			}
 
@@ -273,8 +290,7 @@ class Gra {
 
 				if (bullet.checkCollision(this._ufo)) {
 					bullet.ghost = true;
-					clearInterval(this._bulletGeneratorInterval)
-					this._ufo.stopUfo()
+					this.destroyUfo();
 					this._punktacja += 200;
 				}
 			};
@@ -284,6 +300,12 @@ class Gra {
 		if (this._meteors.length == 0) {
 			this.nextLevel()
 		}
+	}
+
+	private destroyUfo() {
+
+		clearInterval(this._bulletGeneratorInterval);
+		this._ufo.stopUfo();
 	}
 
 	private playerCrashed() {
@@ -299,6 +321,7 @@ class Gra {
 			bullet.update()
 			bullet.draw(this._context)
 			if(bullet.checkCollision(this._ship)) {
+				bullet.ghost = true;
 				this.playerCrashed();
 				return true
 			}
@@ -312,8 +335,7 @@ class Gra {
 			this.keepOnScreen(this._ufo)
 			this._ufo.draw(this._context)
 			if(!this._ufo.p.inBox(0,0, this._canvasWidth, this._canvasHeight)){
-				clearInterval(this._bulletGeneratorInterval)
-				this._ufo?.stopUfo()
+				this.destroyUfo()
 			}
 		}
 	}
@@ -420,6 +442,7 @@ class Gra {
 		this._shipBullets.forEach(function (bullet1: Bullet) {
 			bullet1.freeze = true;
 		});
+		this._ufo.freeze = true;
 	}
 
 	turnShip() {
@@ -502,6 +525,8 @@ class Gra {
 	}
 
 	gameOver() {
+		this.destroyUfo();
+		clearInterval(this._ufoInterval)
 		this._dialog.showDialog("game over", true, Infinity);
 		this.freezeAllActors();
 	}
@@ -518,15 +543,7 @@ class Gra {
 		this._dialog.showDialog(`level ${this._level}`, false, 2000)
 	}
 
-	setupMeteors() {
-		console.log("setupMeteors " + this._level);
-		for (let i = 0; i < this._level; i++) {
-			console.log("setupMeteors");
-			const meteor = new Meteor(3);
-			meteor.randomizeInitialParams(this._canvasWidth, this._canvasHeight)
-			this._meteors.push(meteor);
-		}
-	}
+
 }
 
 const gra = new Gra(); // 1

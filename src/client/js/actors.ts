@@ -2,6 +2,7 @@ import { Position, Vector } from "./2dmath";
 import { Body2d } from "./body2d";
 import * as THREE from "three";
 import fireSound from "../assets/gun2.mp3"
+import ufoFireSound from "../assets/gun.mp3"
 import explosionSound from "../assets/explode.wav"
 import ufoSound from "../assets/ufo.mp3"
 import anime from "animejs";
@@ -17,6 +18,8 @@ explosionAudio.volume = 0.1;
 const ufoAudio = new Audio(ufoSound);
 ufoAudio.volume = 0.1;
 
+const ufoFireAudio = new Audio(ufoFireSound);
+ufoFireAudio.volume = 0.2;
 
 export class Ship extends Body2d {
 	angle: number = Math.PI / 60;
@@ -440,21 +443,22 @@ export class Ufo extends Body2d {
 		const v = this.p.vectorTo(p).setMagnitude(3)
 		bullet.setVelocity2(v)
 		bullet.setPosition2(this.p)
+		ufoFireAudio.play()
 		return bullet
 	}
 
 	startUfo(_canvasWidth: number, _canvasHeight: number) {
 		this.ghost = false
 
-		let randomX = (0.1+Math.random()) * _canvasWidth;
-		let randomY = (0.1+Math.random()) * _canvasHeight;
+		let randomX = Math.random() * _canvasWidth;
+		let randomY = Math.random() * _canvasHeight;
 
-		randomX = randomX > 0.5 * _canvasWidth ? _canvasWidth : 0
+		randomX = randomX > 0.5 * _canvasWidth ? _canvasWidth-1 : 1
 			let position = new Position(randomX, randomY);
 
 		let v = position.vectorTo({
-			x: randomX==0?_canvasWidth:0,
-			y: Math.random() * _canvasHeight/2
+			x: randomX==1?_canvasWidth-1:1,
+			y: 1 + Math.random() * _canvasHeight/2
 		}).setMagnitude(2)
 
 		this.setPosition2(position);

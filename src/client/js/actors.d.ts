@@ -48,14 +48,11 @@ export declare class Bullet extends Body2d {
     draw(context: CanvasRenderingContext2D): void;
 }
 export declare class Ufo extends Body2d {
-    private _bullets;
-    shootAt(p: Position): void;
+    shootAt(p: Position): Bullet;
     startUfo(_canvasWidth: number, _canvasHeight: number): void;
-    bullets: Bullet[];
     constructor(time: number);
     draw(ctx: CanvasRenderingContext2D): void;
     update(): void;
-    animateBulets(ctx: CanvasRenderingContext2D): void;
     stopUfo(): void;
 }
 //# sourceMappingURL=actors.d.ts.map

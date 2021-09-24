@@ -1,49 +1,32 @@
 import { Position, Vector } from "./2dmath";
 import { Body2d } from "./body2d";
 import * as THREE from "three";
-import fireSound from "../assets/gun2.mp3"
-import ufoFireSound from "../assets/gun.mp3"
-import explosionSound from "../assets/explode.wav"
-import ufoSound from "../assets/ufo.mp3"
 import anime from "animejs";
-
 import _ from "lodash";
-
-const fireAudio = new Audio(fireSound);
-fireAudio.volume = 0.1;
-
-const explosionAudio = new Audio(explosionSound);
-explosionAudio.volume = 0.1;
-
-const ufoAudio = new Audio(ufoSound);
-ufoAudio.volume = 0.1;
-
-const ufoFireAudio = new Audio(ufoFireSound);
-ufoFireAudio.volume = 0.2;
+import Assets, { AssetsTypes } from "./assets";
 
 export class Ship extends Body2d {
+
 	angle: number = Math.PI / 60;
 	mesh!: THREE.Mesh;
+
+	flip() {
+		this.d = this.d.multiply(-1)
+	}
 
 	turnLeft() {
 		if (this.freeze == true) return;
 		this.d.rotate2(-this.angle);
-		//this.mesh.rotateZ(this.angle);
 	}
 	turnRight() {
 		if (this.freeze == true) return;
 		this.d.rotate2(this.angle);
-		//this.mesh.rotateZ(-this.angle);
 	}
 
 	audio = null;
 	constructor() {
 		super();
 		this.setRadius(20);
-	}
-
-	getMesh() {
-		// return this.mesh;
 	}
 
 	makeGhost(miliseconds: number) {
@@ -151,9 +134,13 @@ export class Ship extends Body2d {
 		}
 	}
 
-	shoot() {
-		fireAudio.currentTime = 0;
-		fireAudio.play();
+	shoot(): Bullet {
+		Assets.play(AssetsTypes.FIRE_SOUND, 0)
+		const bullet = new Bullet()
+		bullet.setDirection2(this.d.copy())
+		bullet.setPosition2(this.p)
+		bullet.setVelocity2(this.d.setMagnitude(10))
+		return bullet
 	}
 }
 
@@ -280,7 +267,7 @@ export class Meteor extends Body2d {
 	randomizeInitialParams(w: number, h: number) {
 		let randomX = Math.random() * w;
 		let randomY = Math.random() * h;
-		this.setRadius(40);
+		this.setRadius(30);
 		let v = new Vector((Math.random() - 0.5) * 5, (Math.random() - 0.5) * 5);
 
 		let position = new Position(randomX, randomY);
@@ -346,7 +333,7 @@ export class Meteor extends Body2d {
 			let helperVector = shootVector.rotate(angle);
 			for (let i = this.size; i > 0; i--) {
 				const fragment = new Meteor(this.size - 1);
-				fragment.setRadius(this.size * 10);
+				fragment.setRadius(this.size * 6);
 				fragment.setPosition2(this.p.add(helperVector));
 				helperVector.setMagnitude2(this._baseSpeed - this.size);
 				fragment.setVelocity2(helperVector.copy());
@@ -358,8 +345,7 @@ export class Meteor extends Body2d {
 				helperVector.rotate2((Math.PI * 2) / this.size);
 			}
 		}
-		explosionAudio.currentTime = 0;
-		explosionAudio.play();
+		Assets.play(AssetsTypes.EXPLOSION_SOUND, 0)
 		return fragments;
 	}
 
@@ -368,7 +354,6 @@ export class Meteor extends Body2d {
 
 		context.translate(this.p.x, this.p.y);
 		context.rotate(this.d.angle());
-		//context.scale(this.size * 0.34, this.size * 0.34);
 
 		context.beginPath();
 
@@ -397,8 +382,6 @@ export class Bullet extends Body2d {
 
 	constructor() {
 		super();
-		ufoAudio.autoplay = false;
-		ufoAudio.loop = false;
 		this.setRadius(3);
 	}
 
@@ -437,13 +420,13 @@ export class Bullet extends Body2d {
 }
 
 export class Ufo extends Body2d {
-	
+
 	shootAt(p: Position) {
 		const bullet = new Bullet()
 		const v = this.p.vectorTo(p).setMagnitude(3)
 		bullet.setVelocity2(v)
 		bullet.setPosition2(this.p)
-		ufoFireAudio.play()
+		Assets.play(AssetsTypes.UFO_FIRE_SOUND)
 		return bullet
 	}
 
@@ -453,33 +436,31 @@ export class Ufo extends Body2d {
 		let randomX = Math.random() * _canvasWidth;
 		let randomY = Math.random() * _canvasHeight;
 
-		randomX = randomX > 0.5 * _canvasWidth ? _canvasWidth-1 : 1
-			let position = new Position(randomX, randomY);
+		randomX = randomX > 0.5 * _canvasWidth ? _canvasWidth - 1 : 1
+		let position = new Position(randomX, randomY);
 
 		let v = position.vectorTo({
-			x: randomX==1?_canvasWidth-1:1,
-			y: 1 + Math.random() * _canvasHeight/2
+			x: randomX == 1 ? _canvasWidth - 1 : 1,
+			y: 1 + Math.random() * _canvasHeight / 2
 		}).setMagnitude(2)
 
 		this.setPosition2(position);
 		this.setVelocity2(v);
 		this.setDirection2(v);
 
-		ufoAudio.play()
-
+		Assets.play(AssetsTypes.UFO_SOUND);
 	}
 
-	 constructor(time: number) {
+	constructor(time: number) {
 		super();
 		this.ghost = true;
-		this.setRadius(40);
+		this.setRadius(20);
 	}
 
 	override draw(ctx: CanvasRenderingContext2D) {
-		if(this.ghost) return
+		if (this.ghost) return
 		ctx.save()
 		ctx.translate(this.p.x, this.p.y)
-		//ctx.rotate(this.d.angle())
 		ctx.strokeStyle = "white";
 		ctx.lineWidth = 2;
 		ctx.shadowBlur = 5;
@@ -489,9 +470,7 @@ export class Ufo extends Body2d {
 		ctx.beginPath()
 		ctx.ellipse(0, -5, 10, 8, 0, 0, 2 * Math.PI);
 		ctx.moveTo(5, -1);
-		// ctx.beginPath()
 		ctx.ellipse(0, 6, 20, 5, 0, 0, 2 * Math.PI);
-		// ctx.beginPath()
 		ctx.moveTo(15, 0);
 		ctx.ellipse(0, 0, 30, 8, 0, 0, 2 * Math.PI);
 		ctx.stroke();
@@ -503,8 +482,6 @@ export class Ufo extends Body2d {
 		ctx.shadowBlur = 2;
 
 		ctx.stroke();
-
-		
 		ctx.restore()
 		super.draw(ctx)
 	}
@@ -513,13 +490,13 @@ export class Ufo extends Body2d {
 		super.update()
 	}
 
-	stopUfo()
-	{
+	stopUfo() {
 		anime({
-			targets: ufoAudio,
+			targets: Assets.get(AssetsTypes.UFO_SOUND),
 			volume: 0,
-			easing: 'linear'
-		}).play();
+			easing: 'linear',
+			autoplay: true,
+		})
 
 		this.ghost = true;
 	}

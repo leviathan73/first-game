@@ -146,7 +146,6 @@ drawdebug(context: CanvasRenderingContext2D) {
 
 }
 
-
   draw(context: CanvasRenderingContext2D) {
     if(!Body2d.debug) return;
 	context.save();

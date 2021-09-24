@@ -1,11 +1,9 @@
 import { Ship, Meteor, Bullet, Ufo } from "./actors";
 import { Dialog } from "./dialog";
-import { Position, Vector } from "./2dmath";
-import fontAsset from "../assets/Codystar-Regular.ttf"
-import backgroundMusic from "../assets/game-music.mp3"
-import _, { method } from "lodash"
+import _ from "lodash"
 import * as DGUI from "dat.gui"
 import { Body2d } from "./body2d";
+import Assets, { AssetsTypes } from "./assets";
 
 let controls = new DGUI.GUI()
 controls.add(Body2d, "debug").onChange(() => {
@@ -27,7 +25,7 @@ interface KEYS {
 class Gra {
 	//   status gry
 
-	/* #region properties */
+	//#region properties
 
 	private _punktacja: number = 0;
 
@@ -71,6 +69,7 @@ class Gra {
 	private _mouseY = 0;
 
 	private _keys: any = {};
+	private _keytimes: any = {};
 
 	private _speed: number = 0;
 
@@ -78,7 +77,7 @@ class Gra {
 
 	private _starsImageData!: ImageData;
 
-	// #endregion
+	//#endregion
 
 	constructor() {
 		this._dialog = new Dialog()
@@ -118,30 +117,17 @@ class Gra {
 			this._ufoBullets.push(this._ufo.shootAt(this._ship.p))
 
 			clearInterval(this._ufoGunInterval)
-			
+
 			this._ufoGunInterval = window.setInterval(() => {
-			
-				if(!this._ufo.ghost) this._ufoBullets.push(this._ufo.shootAt(this._ship.p))
-			
+
+				if (!this._ufo.ghost) this._ufoBullets.push(this._ufo.shootAt(this._ship.p))
+
 			}, 2 * 1000)
 		}, 30 * 1000)
 	}
 
 	setupMusic() {
-		const backgroundAudio = new Audio(backgroundMusic);
-		backgroundAudio.muted = true;
-		backgroundAudio.volume = 0.02;
-		backgroundAudio.loop = true;
-		backgroundAudio.autoplay = false;
-		backgroundAudio.muted = false;
-		backgroundAudio.play()
-	}
-
-	font!: FontFace;
-	async setupAssets() {
-		// @ts-ignore
-		this.font = new FontFace("DotsFont", `url(${fontAsset})`);
-		return this.font.load()
+		Assets.play(AssetsTypes.BACKGROUND_MUSIC, 0, 0.01, true);
 	}
 
 	setupCanvas() {
@@ -200,12 +186,7 @@ class Gra {
 	}
 
 	addPlayerBullet() {
-		const bullet = new Bullet();
-		bullet.setDirection2(this._ship.d.copy());
-		bullet.setPosition2(this._ship.p);
-		bullet.setVelocity2(this._ship.d.setMagnitude(10)); //.add(this.ship.v)
-		this._shipBullets.push(bullet);
-		this._ship.shoot();
+		this._shipBullets.push(this._ship.shoot());
 	}
 
 	setupPlayer() {
@@ -236,7 +217,7 @@ class Gra {
 			this.animateMeteors();
 			this.animatePlayer();
 			this.animateBulltes()
-			
+
 			this.animateUfo();
 			this.animateUfoBulets()
 		}
@@ -303,29 +284,31 @@ class Gra {
 	}
 
 	private destroyUfo() {
-
+		Assets.play(AssetsTypes.EXPLOSION_SOUND)
 		clearInterval(this._bulletGeneratorInterval);
 		this._ufo.stopUfo();
 	}
 
 	private playerCrashed() {
 		this.zycia--;
-		if (this.zycia > 0)
+		if (this.zycia > 0) {
+			Assets.play(AssetsTypes.EXPLOSION_SOUND)
 			this.resetPlayer();
+		}
 		else
 			this.gameOver();
 	}
 
 	animateUfoBulets() {
-		this._ufoBullets.filter((bullet)=>{
+		this._ufoBullets.filter((bullet) => {
 			bullet.update()
 			bullet.draw(this._context)
-			if(bullet.checkCollision(this._ship)) {
+			if (bullet.checkCollision(this._ship)) {
 				bullet.ghost = true;
 				this.playerCrashed();
 				return true
 			}
-			return !bullet.p.inBox(0,0, this._canvasWidth, this._canvasWidth)
+			return !bullet.p.inBox(0, 0, this._canvasWidth, this._canvasWidth)
 		})
 	}
 
@@ -334,7 +317,7 @@ class Gra {
 			this._ufo.update()
 			this.keepOnScreen(this._ufo)
 			this._ufo.draw(this._context)
-			if(!this._ufo.p.inBox(0,0, this._canvasWidth, this._canvasHeight)){
+			if (!this._ufo.p.inBox(0, 0, this._canvasWidth, this._canvasHeight)) {
 				this.destroyUfo()
 			}
 		}
@@ -422,10 +405,14 @@ class Gra {
 		});
 
 		window.addEventListener("keydown", (e) => {
-			if (this._freeze) return;
+			if (this._freeze || this._keys[e.code]) return;
 			if (e.code == "Space" && !this._keys["Space"]) this.addPlayerBullet();
 			this._keys[e.code] = true;
+			let elapsed = ((performance.now() - this._keytimes[e.code])) || performance.now()
+			if (elapsed < 300 && e.code == "ArrowDown") this._ship.flip()
+			this._keytimes[e.code] = performance.now()
 		});
+
 
 		window.addEventListener("keyup", (e) => {
 			if (this._freeze) return;
@@ -519,8 +506,8 @@ class Gra {
 	drawHelp() {
 		this._context.save();
 		this._context
-		this._context.font = "17px DotsFont";
-		this._context.strokeText("Use ARROWS and SPACEBAR.", 10, this._canvasHeight - 20)
+		this._context.font = "13px DotsFont";
+		this._context.strokeText("Use ARROWS and SPACEBAR. 2 x Down to flip", 10, this._canvasHeight - 20)
 		this._context.restore();
 	}
 
@@ -547,12 +534,13 @@ class Gra {
 }
 
 const gra = new Gra(); // 1
-gra.setupAssets().then(function (font) {
-	// with canvas, if this is ommited won't work
-	// @ts-ignore
-	document.fonts.add(font);
+
+Assets.loadAllAssets().then((assetes) => {
+	console.log(assetes)
 	petlaGry(); // 2
-});
+}).catch(
+
+);
 
 function petlaGry() {
 	gra.render2D(); // 3, 4 ,5 ,6 ,7 ,8

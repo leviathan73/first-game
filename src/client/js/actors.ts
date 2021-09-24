@@ -73,11 +73,11 @@ export class Ship extends Body2d {
 	drawShipBody(context: CanvasRenderingContext2D, noFill: boolean) {
 		context.save();
 		//lasery
-		context.beginPath();
-		context.moveTo(8, 25);
-		context.lineTo(8, 10);
-		context.moveTo(-8, 25);
-		context.lineTo(-8, 10);
+		//  context.beginPath();
+		// context.moveTo(8, 25);
+		// context.lineTo(8, 10);
+		// context.moveTo(-8, 25);
+		// context.lineTo(-8, 10);
 
 		let transparancy = this.ghost ? 0.5 + Math.sin(this.lastupdate / 100) * 0.2 : 1
 		context.shadowBlur = 5 + transparancy * 5;
@@ -85,7 +85,7 @@ export class Ship extends Body2d {
 		context.strokeStyle = `rgba(255,255,255,${transparancy}`
 		context.lineCap = "round";
 		context.lineWidth = 1;
-		context.stroke();
+		// context.stroke();
 
 		//hull
 		context.beginPath();
@@ -103,6 +103,14 @@ export class Ship extends Body2d {
 		context.strokeStyle = `RGBA(250,250,250,${transparancy})`;
 		context.lineWidth = 2;
 		context.stroke();
+
+
+		context.beginPath()
+		context.ellipse(0, 25, 3, 3, 0, 0, Math.PI * 2);
+		context.lineWidth = 2;
+		context.closePath()
+		context.stroke();
+
 
 		if (!noFill) {
 			context.fillStyle = `RGBA(50,50,50,${transparancy})`;

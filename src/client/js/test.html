@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Document</title>
+	<script src="https://unpkg.com/react@17/umd/react.development.js"></script>
+	<script src="https://unpkg.com/react-dom@17/umd/react-dom.development.js"></script>
+	<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+	<link href="https://unpkg.com/material-components-web@latest/dist/material-components-web.css" rel="stylesheet">
+	<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+	<script src="https://unpkg.com/material-components-web@latest/dist/material-components-web.js"></script>
+</head>
+
+<body onload="">
+	<div></div>
+</body>
+
+<script type="text/babel">
+
+	class Header extends React.Component { // > Krystian
+		componentDidMount() {
+			console.log("header dodany")
+		}
+		render() {
+			return <h1 style={{
+					"padding": "4px",
+					"backgroundColor": this.props.color
+				}}> {this.props.children}</h1>
+		}
+	}
+
+	function Menu(props) {
+		return <div style={{
+					"padding": "4px",
+					"backgroundColor": props.color
+				}}>Menu</div>
+	}
+
+	class Button extends React.Component {
+		componentDidMount() {
+			console.log("Button dodany", this.props.text)
+		}
+
+		componentDidUpdate() {
+			console.log("Button zmieniony", this.props.text)
+		}
+		render() {
+			return <button className="mdc-button mdc-button--unelevated mdc-button--raised 	">
+							<div className="mdc-button__ripple"></div>
+							<i className="material-icons mdc-button__icon" aria-hidden="true">bookmark</i>
+							{this.props.text}
+						</button>
+		}
+	}
+
+	function Content(props) {
+
+		let componentDidMount =  function() {
+			console.log("content dodany")
+		}
+
+		return <div style={{
+					"padding": "24px",
+					"backgroundColor": props.color
+				}}>
+				{props.children}
+				</div>
+	}
+	function getColor() { return }
+ 
+	let buttons = ["Home","Content","About me","React"].map((v,i)=>{return <Button  key={i} text={v}/>})
+console.log(buttons)
+	let virtualDOM = <>
+				<Header color="Header" />
+				<Menu color={getColor("limegreen")+"asdasdasd"} />
+				<Content >
+					{buttons}
+				</Content>
+			</>
+
+	console.log(virtualDOM)
+	ReactDOM.render(virtualDOM,document.body.firstElementChild)
+
+	
+</script>
+
+</html>

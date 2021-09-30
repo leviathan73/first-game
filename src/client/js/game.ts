@@ -5,10 +5,10 @@ import * as DGUI from "dat.gui"
 import { Body2d } from "./body2d";
 import Assets, { AssetsTypes } from "./assets";
 
-let controls = new DGUI.GUI()
-controls.add(Body2d, "debug").onChange(() => {
+// let controls = new DGUI.GUI()
+// controls.add(Body2d, "debug").onChange(() => {
 
-})
+// })
 
 let mobileAndTabletCheck = function () {
 	let check = false;
